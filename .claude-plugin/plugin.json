@@ -1,6 +1,6 @@
 {
   "name": "destiny",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Real fortune reading for Claude Code. /destiny computes 사주팔자 (Four Pillars / BaZi) from your birth date+time using 만세력, today's 일진, and one I-Ching hexagram via 매화역수 시점법 — then interprets it. Powered by lunar-python; no external APIs.",
   "author": {
     "name": "xodn348",
