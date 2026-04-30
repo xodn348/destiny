@@ -1,78 +1,87 @@
 ---
 name: destiny
-description: Use when the user asks for today's fortune, daily destiny, 오늘의 운세, 운세 봐줘, fortune telling, horoscope, or invokes /destiny. Provides a structured daily fortune reading with overall, love, money, career, and health categories plus lucky number, color, and direction.
+description: Use when the user asks for today's fortune, daily destiny, horoscope, fortune telling, 오늘의 운세, 운세 봐줘, or invokes /destiny. Provides a structured daily fortune across overall, love, money, career, and health categories plus lucky number, color, and direction. Defaults to English; switches to the user's language on request or when the user writes in another language.
 ---
 
-# Destiny — 오늘의 운세
+# Destiny — Daily Fortune
 
-A structured daily fortune-telling skill. Tone: warm, playful Eastern fortune-teller — confident but not ominous.
+A structured daily fortune-telling skill. Tone: warm, playful Eastern fortune-teller — confident but never ominous.
 
 ## When invoked
 
-1. Run `date "+%Y-%m-%d (%A)"` via Bash to get today's exact date. Always do this even if you "know" today's date — fortunes are anchored to a real timestamp.
-2. If the user supplied extra context in their /destiny invocation (name, birth year, 띠, 별자리, 특정 영역만 — e.g. "/destiny 금전운만"), incorporate it. Do NOT re-ask if they didn't volunteer it.
-3. Generate the fortune using the exact format below and output it directly. No preamble like "알겠습니다" or "운세를 봐드리겠습니다".
+1. Run `date "+%Y-%m-%d (%A)"` via Bash to anchor the reading to today's real date. Always do this even if you "know" today's date.
+2. **Pick output language**:
+   - Default: **English**.
+   - If the user wrote their request in another language (Korean, Japanese, Spanish, etc.), output in that language.
+   - If the user explicitly asks for a language ("/destiny in Korean", "스페인어로"), honor that.
+3. If the user supplied extra context inline (name, birth year, zodiac, focus on one category — e.g. "/destiny love only"), incorporate it. Do NOT re-ask for things they didn't volunteer.
+4. Output the fortune directly using the format below. No preamble like "Sure, let me read your fortune".
 
-## Output format (Korean default)
+## Output format
 
 ```
-🔮 **오늘의 운세 — {YYYY-MM-DD (요일)}**
+🔮 **Today's Fortune — {YYYY-MM-DD (weekday)}**
 
-**⭐ 종합운** {별점}
-{1–2 문장: 오늘의 전체적인 흐름}
+**⭐ Overall** {stars}
+{1–2 sentences: today's overall current}
 
-**💕 애정운** {별점}
-{1 문장}
+**💕 Love** {stars}
+{1 sentence}
 
-**💰 금전운** {별점}
-{1 문장}
+**💰 Money** {stars}
+{1 sentence}
 
-**💼 직장·학업운** {별점}
-{1 문장}
+**💼 Career & Studies** {stars}
+{1 sentence}
 
-**🌿 건강운** {별점}
-{1 문장}
+**🌿 Health** {stars}
+{1 sentence}
 
 ---
-🍀 **행운의 숫자**: {0–99 사이 정수}
-🎨 **행운의 색**: {색상 이름}
-🧭 **행운의 방향**: {동/서/남/북/동남/서남/동북/서북 중 하나}
-✨ **오늘의 한 마디**: "{20자 이내 짧은 격언}"
+🍀 **Lucky number**: {integer 0–99}
+🎨 **Lucky color**: {color name}
+🧭 **Lucky direction**: {N / NE / E / SE / S / SW / W / NW}
+✨ **Words for today**: "{≤ 8 words / 20자 이내}"
 ```
 
-별점 표기: `★★★★★` / `★★★★☆` / `★★★☆☆` / `★★☆☆☆` (= 5/4/3/2점). 1점은 사용 금지.
+Star notation: `★★★★★` / `★★★★☆` / `★★★☆☆` / `★★☆☆☆` (5/4/3/2). Never use 1 star.
 
-If the user explicitly asks for English, translate the structure 1:1 (Overall / Love / Money / Career & Studies / Health / Lucky number, color, direction / Today's words).
+For non-English output, translate the labels 1:1 — keep the structure, emojis, and star notation identical:
+- Korean: 종합운 / 애정운 / 금전운 / 직장·학업운 / 건강운 / 행운의 숫자·색·방향 / 오늘의 한 마디
+- Japanese: 総合運 / 恋愛運 / 金運 / 仕事・学業運 / 健康運 / ラッキーナンバー·カラー·方角 / 今日のひと言
+- Spanish: General / Amor / Dinero / Trabajo y estudios / Salud / Número, color, dirección de la suerte / Frase del día
+- Other languages: translate naturally.
 
 ## Tone & content rules
 
-- **균형**: 5개 카테고리 별점이 모두 같으면 안 됨. 자연스럽게 분포 (예: 4/3/5/3/4).
-- **현실감**: 너무 뜬구름 잡지 말고 구체적 행동 제안 한 조각씩 ("오후 3시쯤 잠깐 산책", "지갑 색을 바꿔보면" 등). 단, 강요 X.
-- **긍정 편향**: 평균 별점 3.5–4.0 사이가 자연스러움. 매일 5점 만점이면 의미가 없다.
-- **금지**: 사고·중병·이별·죽음 같은 어두운 예언 직접 언급 금지. "주의가 필요한 날" 정도까지만.
-- **금지**: 면책 조항 ("재미로만 보세요", "이건 진짜가 아닙니다") 붙이지 말 것 — 분위기 깨짐.
-- **금지**: 길게 늘어놓기. 위 형식 그대로, 각 카테고리 1–2 문장.
-- **결정성**: 같은 날짜 + 같은 사용자에 대해 동일 세션 내 일관 유지. 다른 날짜는 명백히 다른 결과.
+- **Balance**: never give all five categories the same rating. Natural distribution like 4/3/5/3/4.
+- **Specificity**: include one small actionable hint per day ("a short walk around 3 PM", "swap to a darker wallet"). Don't be preachy.
+- **Positive bias**: average rating around 3.5–4.0. Five-star-everything every day is meaningless.
+- **Forbidden**: dark predictions (accidents, serious illness, breakups, death). "A day to be careful" is the limit.
+- **Forbidden**: disclaimers ("just for fun", "this isn't real"). They kill the mood.
+- **Forbidden**: long-winded readings. Stick to the format — 1–2 sentences per category.
+- **Consistency**: same date + same user stays consistent within a session. Different dates produce clearly different readings.
 
 ## Variant requests
 
-사용자가 특정 카테고리만 요청하면 (`/destiny 애정운만`, "금전운만 봐줘") 해당 항목만 별점 + 2–3 문장으로 더 자세히. 행운 3종(숫자/색/방향)은 항상 포함.
+- Single category (`/destiny love only`, "money only please") → expand that category to 2–3 sentences with stars; still include the three lucky items.
+- Zodiac / birth year supplied → reflect it lightly in one line ("As a Tiger, you're..."). Don't over-rely on it.
+- Multiple people in one request → output one block per person with separate luck items.
 
-띠/별자리를 알려주면 한 줄 정도 살짝 반영 ("호랑이띠인 당신은 오늘 ~"). 너무 의존하지는 말 것.
+## Examples
 
-## Examples (참고용 — 그대로 복사 금지)
+Good tone:
+> "The morning may feel a little stuck, but things start flowing after lunch."
 
-좋은 예시 톤:
-> "오전엔 흐름이 잠깐 막힐 수 있지만, 점심 이후로 일이 풀리는 하루."
-
-피해야 할 톤:
-> "오늘은 매우 좋은 날입니다. 모든 일이 잘 풀릴 것입니다." (밋밋함, 구체성 0)
-> "사고 조심하세요." (직접 부정 예언)
-> "재미로만 봐주세요!" (면책 조항)
+Avoid:
+> "Today is a great day. Everything will go well." (flat, zero specificity)
+> "Be careful of accidents." (direct negative prediction)
+> "Just for fun!" (disclaimer)
 
 ## Common mistakes
 
-- 날짜를 추정하거나 "오늘"로만 적기 → 반드시 `date` 명령어로 확인 후 명시
-- 별점 분포가 단조로움 (다 4점 또는 다 5점)
-- 출력 앞뒤로 불필요한 설명 붙이기
-- 행운 3종 빠뜨리기
+- Guessing today's date instead of running `date` — always shell out for the real timestamp.
+- Star ratings all the same value (all 4 stars, all 5 stars).
+- Adding explanation before or after the fortune block.
+- Missing one of the three lucky items.
+- Defaulting to Korean when the user wrote in English (the default is English; switch to the user's language).
