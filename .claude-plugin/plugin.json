@@ -1,0 +1,12 @@
+{
+  "name": "destiny",
+  "version": "0.1.0",
+  "description": "오늘의 운세 — daily fortune skill. Invoke /destiny for a structured fortune with overall, love, money, career, and health readings plus lucky number, color, and direction.",
+  "author": {
+    "name": "xodn348",
+    "email": "xodn348@tamu.edu"
+  },
+  "license": "MIT",
+  "keywords": ["fortune", "destiny", "오늘의운세", "운세", "horoscope", "fun"],
+  "homepage": "https://github.com/xodn348/destiny"
+}

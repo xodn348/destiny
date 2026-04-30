@@ -1,0 +1,14 @@
+{
+  "name": "destiny-marketplace",
+  "owner": {
+    "name": "xodn348",
+    "email": "xodn348@tamu.edu"
+  },
+  "plugins": [
+    {
+      "name": "destiny",
+      "source": ".",
+      "description": "오늘의 운세 — daily fortune skill (/destiny)"
+    }
+  ]
+}
