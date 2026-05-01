@@ -47,6 +47,14 @@ Each `/destiny` produces a two-section reading:
 
 **🌌 Life Reading** — your character, the broad arc of your life, and where you are in your current 10-year period. Plain language, no untranslated jargon.
 
+## Example output
+
+<p align="center">
+  <img src="assets/example.png" alt="Sample /destiny reading" width="700">
+</p>
+
+<p align="center"><sub>Real run from a sample profile (1992-07-31, Suwon). Same person + same day always produces identical script output; only the prose phrasing changes between calls.</sub></p>
+
 ## How it works (the principles in 60 seconds)
 
 This skill uses three pieces of classical East Asian metaphysics, each computed deterministically from your birth date and time:

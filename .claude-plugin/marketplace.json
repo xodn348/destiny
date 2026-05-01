@@ -9,7 +9,7 @@
     {
       "name": "destiny",
       "description": "오늘의 운세 — daily fortune. Computes real 사주팔자 + today's 일진 + I-Ching hexagram via lunar-python; Claude interprets with 명리 knowledge. Three-section reading: today's fortune, full life destiny, transparent reasoning.",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "source": "./",
       "author": {
         "name": "xodn348",

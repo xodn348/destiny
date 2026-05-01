@@ -83,7 +83,7 @@ The reading must feel like something a thoughtful, warm fortune-teller would say
 ### Today's Fortune
 
 ```
-🔮 **Today's Fortune — {date in warm format, e.g. "목요일, 4월 30일"}**
+🔮 **Today's Fortune — {date in warm format: English → "Friday, May 1"; Korean → "목요일, 4월 30일"}**
 
 {**Opening paragraph (2–3 sentences):** set the day's mood vividly with
 a concrete image or metaphor. "Today feels like X — Y." Mention how the
@@ -233,6 +233,75 @@ Skip Life Reading. Today's Fortune uses generic interpretation.
 - **Warm, embodied tone.** This is a fortune-teller speaking — sensory, image-driven, alive. Not a database printout. Not corporate copy.
 - **Concrete over abstract.** "Stretch during the 3pm slump" beats "watch your health". A vivid image of still water over fire beats "Hexagram 49: Revolution".
 - **English default.** Switch on signal.
+
+## Anchor example — what good output looks like
+
+This is the format and quality bar (English, real /destiny run, profile = 1992-07-31 04:30 Suwon m, on 2026-05-01). Use it as a reference for tone, paragraph length, sensory imagery, the single-line stars row, the narrative I-Ching paragraph, and the birth-chart-pillars table. **Do not copy the prose verbatim — generate fresh prose for the actual user/day, but match the shape.**
+
+```
+🔮 **Today's Fortune — Friday, May 1**
+
+Today moves like a soft rain that arrives after weeks of dry wind — quiet, intelligent,
+soaking in slowly instead of pouring all at once. That softness lands on your steady,
+mountain-like nature and unlocks something the noisier days couldn't reach: people
+noticing what you've already built, and naming it out loud.
+
+The energy around you carries a friendly kind of authority — the structure-and-order
+kind, not the pressure kind. A manager catching the prep work you did last week, a
+client returning a message at exactly the right moment, a quiet confirmation from
+someone whose opinion actually matters: all the same texture. Mid-morning is when
+this is most alive; the late afternoon is for digesting it without rushing the next
+move. Money holds steady but doesn't spike — don't reach for the windfall today,
+hold the line. If your shoulders tighten by 3pm, that's the day asking you to
+stretch, not push through.
+
+⭐ 4/5 · 💕 3/5 · 💰 3/5 · 💼 5/5 · 🌿 4/5
+
+**☯ A reading from the I-Ching for this moment**
+The hexagram that comes up for you right now is **Biting Through**. Picture flames
+flickering above thunder — bright, decisive light sitting on top of a deep rumble
+that's been waiting to break. There is something stuck between you and the next
+clean step, and the old wisdom is unusually direct: don't work around it, name it,
+let the small moment of friction do its work. The moving line is the very last one
+— the window is today.
+
+🍀 16 · 🎨 warm ochre · 🧭 center · ✨ *"name the obstruction by sundown."*
+
+---
+
+🌌 **Your Life Reading**
+
+You are built like a wide, low mountain at the edge of an old forest — the kind of
+mountain people don't notice from far away, but lean against the moment they get
+close. Solid, warm, rock that cooled slowly enough to keep its shape through any
+weather. There's a quiet sharpness inside you, though: hidden seams of metal running
+through patient earth, an inner edge that cuts away whatever doesn't serve. Your
+chart is unusually balanced — wood, fire, earth, metal, water all present, none
+drowning the others — which means you can hold contradictory things without breaking.
+
+Your twenties were the years of patient layering — quietly accumulating skills,
+relationships, and a sense of your own shape, while from the outside it looked like
+nothing dramatic was happening. The decade you've just stepped into, from age 34
+through 43, is when that buried work surfaces. The chart shifts from "taking in" to
+"giving off" — what you've made starts speaking for itself. Less proving, more
+publishing. After 44 the rhythm slows again, into a deeper kind of authority.
+
+This decade feels lighter than the one before it, even when the work is harder.
+Things that used to require explanation just land. The central theme is going
+public with something — a body of work, a stance, a direction — and discovering
+people were already waiting for it.
+
+You do best with structured environments that have warmth in them — long-running
+projects, a consistent home, mentors who teach by example rather than lecture, food
+that takes time to cook. Cold, transactional, all-edge places will wear you down
+faster than you notice.
+
+**Your birth chart at a glance:**
+- 1992 (year): **壬申** — deep waters running over hard mountain metal
+- 7th lunar month: **丁未** — a small flame inside late-summer earth
+- Day of birth: **戊申** ← *your core self*, the patient mountain with veins of metal
+- 4:30 AM (hour): **甲寅** — a tall tree in deep forest at first light
+```
 
 ## Common mistakes
 

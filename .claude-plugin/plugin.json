@@ -1,6 +1,6 @@
 {
   "name": "destiny",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Real fortune reading for Claude Code. /destiny produces three sections in one shot — today's daily fortune, full life destiny analysis from your 사주, and reasoning footnotes that show what data and 명리 logic backed each conclusion. Powered by lunar-python (real 만세력) + classical 십신/합충 rules + I-Ching 매화역수 시점법. No external APIs.",
   "author": {
     "name": "xodn348",

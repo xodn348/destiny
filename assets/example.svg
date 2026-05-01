@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 2700" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#1a1530"/>
+      <stop offset="50%" stop-color="#2a1a3a"/>
+      <stop offset="100%" stop-color="#3a1a2a"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#1e1e26"/>
+      <stop offset="100%" stop-color="#16161e"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="20"/>
+      <feOffset dx="0" dy="10"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1500" height="2700" fill="url(#bg)"/>
+
+  <g filter="url(#cardShadow)">
+    <rect x="80" y="80" width="1340" height="2540" rx="18" fill="url(#card)"/>
+    <circle cx="120" cy="120" r="9" fill="#ff5f57"/>
+    <circle cx="148" cy="120" r="9" fill="#febc2e"/>
+    <circle cx="176" cy="120" r="9" fill="#28c840"/>
+    <text x="750" y="126" text-anchor="middle" font-family="Menlo, monospace" font-size="14" fill="#6a6a78">/destiny  ·  live output  ·  profile: 1992-07-31 04:30 KST · Suwon · m</text>
+    <line x1="80" y1="155" x2="1420" y2="155" stroke="#2a2a36" stroke-width="1"/>
+  </g>
+
+  <g font-family="Menlo, 'SF Mono', monospace" font-size="22" fill="#e4e4ec">
+    <text x="120" y="210" fill="#cc785c" font-weight="600">[ Today's Fortune ]   Friday, May 1</text>
+
+    <text x="120" y="270">Today moves like a soft rain that arrives after weeks of dry wind —</text>
+    <text x="120" y="302">quiet, intelligent, soaking in slowly instead of pouring all at</text>
+    <text x="120" y="334">once. That softness lands on your steady, mountain-like nature</text>
+    <text x="120" y="366">and unlocks something the noisier days couldn't reach: people</text>
+    <text x="120" y="398">noticing what you've already built, and naming it out loud. The</text>
+    <text x="120" y="430">day asks very little of you up front; what it offers comes through</text>
+    <text x="120" y="462">other people's recognition.</text>
+
+    <text x="120" y="528">The energy around you carries a friendly kind of authority — the</text>
+    <text x="120" y="560">structure-and-order kind, not the pressure kind. A manager catching</text>
+    <text x="120" y="592">the prep work you did last week, a client returning a message at</text>
+    <text x="120" y="624">exactly the right moment, a quiet confirmation from someone whose</text>
+    <text x="120" y="656">opinion actually matters: all the same texture. Mid-morning is when</text>
+    <text x="120" y="688">this is most alive; the late afternoon is for digesting it without</text>
+    <text x="120" y="720">rushing the next move. Money holds steady but doesn't spike — don't</text>
+    <text x="120" y="752">reach for the windfall today, hold the line you already drew. If</text>
+    <text x="120" y="784">your shoulders tighten by 3pm, that's the day asking you to stretch,</text>
+    <text x="120" y="816">not push through. A short walk on bare ground does more than coffee.</text>
+
+    <text x="120" y="882"><tspan fill="#f5b04f">Overall 4/5</tspan>  ·  <tspan fill="#cc6677">Love 3/5</tspan>  ·  <tspan fill="#88aa55">Money 3/5</tspan>  ·  <tspan fill="#5599cc">Career 5/5</tspan>  ·  <tspan fill="#aa77bb">Health 4/5</tspan></text>
+
+    <text x="120" y="948" fill="#cc785c" font-weight="600">A reading from the I-Ching for this moment</text>
+    <text x="120" y="994">The hexagram that comes up for you right now is <tspan fill="#d4b06a" font-weight="600">Biting Through</tspan>.</text>
+    <text x="120" y="1026">Picture flames flickering above thunder — bright, decisive light</text>
+    <text x="120" y="1058">sitting on top of a deep rumble that's been waiting to break. There</text>
+    <text x="120" y="1090">is something stuck between you and the next clean step, and the old</text>
+    <text x="120" y="1122">wisdom is unusually direct: don't work around it, name it, let the</text>
+    <text x="120" y="1154">small moment of friction do its work. The moving line is the very</text>
+    <text x="120" y="1186">last one — the window is today. After today the moment quietly passes.</text>
+
+    <text x="120" y="1252"><tspan fill="#88aaff">Lucky</tspan> 16  ·  <tspan fill="#d4a574">warm ochre</tspan>  ·  <tspan fill="#88aa55">center</tspan>  ·  <tspan fill="#cc785c" font-style="italic">"name the obstruction by sundown."</tspan></text>
+
+    <line x1="120" y1="1314" x2="1380" y2="1314" stroke="#2a2a36" stroke-width="1"/>
+
+    <text x="120" y="1374" fill="#cc785c" font-weight="600">[ Your Life Reading ]</text>
+
+    <text x="120" y="1434">You are built like a wide, low mountain at the edge of an old forest</text>
+    <text x="120" y="1466">— the kind of mountain people don't notice from far away, but lean</text>
+    <text x="120" y="1498">against the moment they get close. Solid, warm, rock that cooled</text>
+    <text x="120" y="1530">slowly enough to keep its shape through any weather. There's a quiet</text>
+    <text x="120" y="1562">sharpness inside you, though: hidden seams of metal running through</text>
+    <text x="120" y="1594">patient earth, an inner edge that cuts away whatever doesn't serve.</text>
+    <text x="120" y="1626">Your chart is unusually balanced — wood, fire, earth, metal, water</text>
+    <text x="120" y="1658">all present, none drowning the others — which means you can hold</text>
+    <text x="120" y="1690">contradictory things without breaking, and people sense the steadi-</text>
+    <text x="120" y="1722">ness even before they can name it.</text>
+
+    <text x="120" y="1788">Your twenties were the years of patient layering — quietly</text>
+    <text x="120" y="1820">accumulating skills, relationships, and a sense of your own shape,</text>
+    <text x="120" y="1852">while from the outside it looked like nothing dramatic was happening.</text>
+    <text x="120" y="1884">The decade you've just stepped into, from age 34 through 43, is when</text>
+    <text x="120" y="1916">that buried work surfaces. The chart shifts from "taking in" to</text>
+    <text x="120" y="1948">"giving off" — what you've made starts speaking for itself. Less</text>
+    <text x="120" y="1980">proving, more publishing. Less waiting to be invited, more being</text>
+    <text x="120" y="2012">asked. After 44 the rhythm slows again, into a deeper kind of</text>
+    <text x="120" y="2044">authority — the kind that doesn't have to argue anymore.</text>
+
+    <text x="120" y="2110">This decade feels lighter than the one before it, even when the work</text>
+    <text x="120" y="2142">is harder. Things that used to require explanation just land. The</text>
+    <text x="120" y="2174">central theme is going public with something — a body of work, a</text>
+    <text x="120" y="2206">stance, a direction — and discovering people were already waiting</text>
+    <text x="120" y="2238">for it. The quietly harder part: you have to choose what to say yes</text>
+    <text x="120" y="2270">to, because more arrives.</text>
+
+    <text x="120" y="2336">You do best with structured environments that have warmth in them —</text>
+    <text x="120" y="2368">long-running projects, a consistent home, mentors who teach by</text>
+    <text x="120" y="2400">example rather than lecture, food that takes time to cook. Cold,</text>
+    <text x="120" y="2432">transactional, all-edge places will wear you down faster than you</text>
+    <text x="120" y="2464">notice. A daily walk on bare ground, a warm meal at day's end, and</text>
+    <text x="120" y="2496">one person you don't have to perform for — these aren't luxuries.</text>
+
+    <line x1="120" y1="2548" x2="1380" y2="2548" stroke="#2a2a36" stroke-width="1"/>
+
+    <text x="120" y="2588" fill="#6a6a78" font-size="18">core self: the patient mountain with veins of metal · current decade: ages 34–43, the "going public" arc</text>
+  </g>
+</svg>
