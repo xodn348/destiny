@@ -1,5 +1,6 @@
 {
   "name": "destiny-marketplace",
+  "description": "Daily fortune marketplace — single-plugin marketplace for /destiny",
   "owner": {
     "name": "xodn348",
     "email": "xodn348@tamu.edu"
@@ -7,11 +8,13 @@
   "plugins": [
     {
       "name": "destiny",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/xodn348/destiny.git"
-      },
-      "description": "오늘의 운세 — daily fortune Claude Code plugin (/destiny). Computes real 사주팔자 + today's 일진 + I-Ching hexagram via lunar-python; Claude interprets with 명리 knowledge. Three-section reading: today's fortune, full life destiny, transparent reasoning."
+      "description": "오늘의 운세 — daily fortune. Computes real 사주팔자 + today's 일진 + I-Ching hexagram via lunar-python; Claude interprets with 명리 knowledge. Three-section reading: today's fortune, full life destiny, transparent reasoning.",
+      "version": "0.4.0",
+      "source": "./",
+      "author": {
+        "name": "xodn348",
+        "email": "xodn348@tamu.edu"
+      }
     }
   ]
 }
