@@ -1,23 +1,23 @@
 ---
 name: destiny
-description: Use when the user asks for a fortune reading, daily destiny, life reading, horoscope, hexagram, I-Ching, 운세, 사주, 명리, or invokes /destiny. Produces THREE sections in one reading — (1) today's daily fortune, (2) full life destiny analysis from the user's 사주, (3) reasoning footnotes that explain what data and 명리 logic backed each conclusion. Computes real 사주 + 일진 + 매화역수 hexagram via lunar-python, then Claude applies its 명리 knowledge to interpret. Stores birth profile after first use. Default English.
+description: Use when the user asks for a fortune reading, daily destiny, life reading, horoscope, hexagram, I-Ching, 운세, 사주, 명리, or invokes /destiny. Produces TWO sections — (1) today's daily fortune, (2) life destiny from the user's 사주 — written in plain language anyone can follow, with no untranslated jargon. Computes real 사주 + 일진 + 매화역수 hexagram via lunar-python; stores birth profile after first use. Default English.
 ---
 
-# Destiny — Today + Life Reading + Reasoning
+# Destiny — Today's Fortune + Life Reading
 
-`/destiny` produces a complete reading in three sections, in this order:
+`/destiny` produces a reading in two sections, in this order:
 
-1. **🔮 Today's Fortune** — daily 5-category stars + hexagram
-2. **🌌 Life Destiny** — character, life arc, current 대운, key themes from the full 사주
-3. **📚 Reasoning** — what data and 명리 logic produced each conclusion (transparent footnotes)
+1. **🔮 Today's Fortune** — daily 5-category stars + hexagram for this moment
+2. **🌌 Life Destiny** — character + life arc + current decade, derived from the user's 사주
 
-The point of section 3 is honesty: every claim above should be traceable to either (a) the script's deterministic output or (b) a specific 명리 principle Claude is applying. No mystery, no "trust me."
+**The reading must be readable by someone who has never heard of 사주, 명리, or I-Ching.** Plain, warm, specific language. No untranslated jargon. No reasoning footnotes — those clutter the experience.
 
 ## Iron rules
 
-- **Never invent stems, branches, hexagrams, or interaction labels.** Only use what the script returns.
-- **Always include the Reasoning section.** It's not optional. It's what makes this skill different from a horoscope.
-- **Distinguish today vs life clearly** — never blur them. Today's section talks about today only. Life section talks about lifelong patterns.
+- **Never invent stems, branches, hexagrams, or labels.** Use only what the script returns.
+- **Two sections only.** Today's Fortune + Life Destiny. No "Reasoning" section, no debug data dumps.
+- **Plain language is mandatory.** Every Chinese character, every 명리/주역 term, must be either (a) skipped entirely or (b) replaced with a short, descriptive English/Korean phrase that conveys what it MEANS, not how it's spelled. See readability rules below.
+- **Distinguish today vs life clearly** — never blur them. Today section = today only. Life section = lifelong patterns.
 
 ## Workflow
 
@@ -28,7 +28,7 @@ PROFILE=~/.destiny/profile.json
 [ -f "$PROFILE" ] && cat "$PROFILE"
 ```
 
-Profile exists → skip to Step 3.
+If profile exists → skip to Step 3 with the stored values.
 
 ### Step 2 — first-time setup
 
@@ -57,11 +57,12 @@ City → longitude:
 | City | Lon | City | Lon |
 |---|---|---|---|
 | Seoul | 126.98 | Tokyo | 139.69 |
-| Busan | 129.08 | Osaka | 135.50 |
-| Jeju | 126.52 | Beijing | 116.41 |
+| Suwon | 127.03 | Osaka | 135.50 |
+| Busan | 129.08 | Beijing | 116.41 |
+| Jeju  | 126.52 | Singapore | 103.82 |
 | New York | -74.01 | London | -0.13 |
 | LA | -118.24 | Paris | 2.35 |
-| Sydney | 151.21 | Singapore | 103.82 |
+| Sydney | 151.21 | | |
 
 ### Step 3 — run script
 
@@ -71,115 +72,122 @@ python3 "$CLAUDE_PLUGIN_ROOT/skills/destiny/scripts/reading.py" \
     --birth "<birth>" --lon <lon> --gender <gender> --sect <sect>
 ```
 
-JSON returned:
-- `today` — date, day pillar, day element
-- `personal` — pillars, day_master, **chart_summary** (element count, season, day master strength, missing/dominant elements), da_yun (8 cycles)
-- `interaction` — 십신 of today→user-day-master + branch relation, with metadata
-- `iching` — hexagram via 매화역수
-- `lucky` — number/color/direction (computed)
+### Step 4 — write the two-section reading
 
-### Step 4 — write the three-section reading
+Use the script JSON. Do not echo raw fields. Translate everything into plain language.
 
-## Output format (English default)
+## Output format
 
 ```
-🔮 **Today's Fortune — {date}**
+🔮 **Today's Fortune — {date in friendly format, e.g. "Thursday, April 30 2026"}**
 
-Today is **{today_day_pillar} day** ({today.day_element}). Against your
-{user_day_pillar} day master, today brings **{shishen}** energy.
-{1 line: branch relation if 합/충/형, skip if 무관계.}
+{1–2 sentences in plain language describing the day's overall mood and what
+the day's energy means specifically for THIS user. Do not say "편관" or
+"Seven Killings" — say "today brings a kind of pressure energy that pushes
+against your steady, grounded nature".}
 
-**⭐ Overall** {stars}      {1 line, today only}
-**💕 Love** {stars}         {1 line}
-**💰 Money** {stars}        {1 line}
-**💼 Career** {stars}       {1 line}
-**🌿 Health** {stars}       {1 line}
+**⭐ Overall** {stars}        {1 line, today only, plain language}
+**💕 Love** {stars}            {1 line}
+**💰 Money** {stars}           {1 line}
+**💼 Career** {stars}          {1 line}
+**🌿 Health** {stars}          {1 line}
 
-**☯ Hexagram for this moment**
-{num}. {en} ({ko} · {zh}) — moving line {moving_line}
-{upper_symbol} over {lower_symbol}
-"{judgment}"
-{1–2 sentences applying to TODAY only.}
+**☯ A reading from the I-Ching for this moment**
+{Hexagram name in plain English}, with a small change in the {moving_line}rd line.
+"{judgment translated into accessible English, not Legge's archaic phrasing}"
+{1–2 sentences applying the hexagram's lesson to TODAY only.}
 
-🍀 Lucky number: {n}    🎨 {color}    🧭 {direction}
-✨ "{≤8 words}"
-
----
-
-🌌 **Your Life Destiny (전체 운명)**
-
-**Birth chart (사주팔자)**
-- Year   {year.gz} ({ko}, {nayin})
-- Month  {month.gz} ({ko}, {nayin}) ← Month branch {month_branch} = {season_of_birth}
-- Day    {day.gz} ({ko}, {nayin}) ← **Day master {day_master} ({day_master_element}, {polarity}, {strength})**
-- Hour   {hour.gz} ({ko}, {nayin})
-
-Element distribution: 木{Wood} 火{Fire} 土{Earth} 金{Metal} 水{Water}
-Dominant: {dominant_element} · Missing: {missing_elements joined or "none"}
-
-**Character (성향)**
-{2–3 sentences. Use day master + element distribution + dominant 십신 (year_gan/month_gan from saju.shishen).
-Apply your 명리 knowledge — this is a lifelong character read, not today.
-Anchor every claim to a specific element or 십신 you can name.}
-
-**Life arc (인생 흐름)**
-{2–3 sentences walking through the 대운 cycles — early life (first 1–2 cycles),
-mid-life (3rd–5th cycles), later life (6th+). Note transitions where the
-ganzhi element of the cycle shifts dramatically.}
-
-**Current 10-year cycle**
-{Find the da_yun whose start_year ≤ today's year < next start_year.}
-{ganzhi} ({ko}), age {start_age}–{next.start_age - 1}
-{2 sentences on the cycle's element vs day master, how it supports or pressures.}
-
-**Estimated 용신 (favorable element)**
-{Claude's reasoning. If day master is strong → reduce/drain via 식상/재성/관성.
-If weak → support via 인성/비겁. Name the element + give 1 sentence why.}
-
-**Estimated 격국 (chart structure)**
-{Claude's best guess: 정관격, 식신격, 편재격, 종왕격, etc., based on month branch
-and dominant 십신. 1 sentence why.}
+🍀 Lucky number: {n}    🎨 {color, plainly named}    🧭 {direction in everyday words: "facing east" not just "East"}
+✨ "{≤8 words takeaway}"
 
 ---
 
-📚 **Reasoning (근거)**
+🌌 **Your Life Reading**
 
-**Today's stars — what determined them:**
-- The shishen of today's day stem ({today.day_gan}) against your day master ({day_master}) is **{shishen}**, which classical 명리 associates with {shishen_meta.domains joined}. Tendency: {shishen_meta.tendency}.
-- Branch relation between today's {today.day_zhi} and your {user_day_zhi}: {branch_relation}. Tendency: {branch_meta.tendency}.
-- {Each star score gets 1 short justification: e.g. "Money 4★ — 편재 favors windfall income, but no 삼합 to amplify"}.
+**Your core nature**
+{2–3 sentences describing the user as a person, derived from their day master
++ chart structure. Plain English. NO "Yang Earth balanced 정인격 살인상생". 
+INSTEAD: "You're an Earth-type person — steady, deliberate, the kind of
+friend people lean on when things get heavy. The way your chart is built,
+outside pressure tends to make you stronger rather than break you."}
 
-**Life-reading sources:**
-- Day master strength estimate ({strength}) is from element distribution: {supportive_count_for_day_master} of 8 chars support your {day_master_element} self. Refined by 월령 ({month_branch} = {season_dominant_element} season).
-- Character read draws on {day_master_element} day master archetype + dominant {dominant_element} influence + month-stem 십신 ({saju.shishen.month_gan}).
-- 용신 reasoning: {brief — strong/weak day master + missing/excess elements + season}.
-- 격국 reasoning: {brief — month branch hidden stem + transparent stem in chart}.
-- 대운 transitions are deterministic from birth (gender + year stem polarity → forward/backward cycle).
+**How your life moves**
+{2–3 sentences walking through the broad rhythms of life. NO "대운 신해운
+상관정재". INSTEAD: "Your twenties were about finding your voice and
+building a body of work. Right now (mid-30s through early 40s) is when
+that quiet building starts paying off visibly. Your forties and fifties
+are when wealth crystallizes."}
 
-**Hexagram method:**
-- 매화역수 시점법 — lunar 연(year branch index {y}) + 월({m}) + 일({d}) [+ user salt {salt}] → upper trigram. + 시({h}) → lower trigram. Sum mod 6 → moving line. Hexagram lookup from King Wen ordering, judgment text from James Legge (1899).
+**Where you are now**
+{2 sentences on the current 10-year period. Name the years (e.g. "2025–2035,
+ages 34 to 43"). Describe what this period feels like in plain terms.}
 
-**Stack:**
-- 사주 8 chars: lunar-python (real 만세력) with true-solar-time correction ({offset_min} min for longitude {lon}), DST adjustment, 야자시 rule.
-- 십신 + 합충형: classical 60갑자 lookup tables in script.
-- Star judgments + character reading + 용신/격국 estimates: Claude applying 명리 knowledge from training data (자평진전, 적천수, modern 명리 references) — not a hand-tuned numeric table.
-- Daily randomness: zero. Same person + same date = same script output. The prose differs each call (LLM generation).
+**What helps you most**
+{1–2 sentences on the user's "favorable element" but described as a kind of
+energy or environment, not as 용신/오행 jargon. e.g. "Your chart benefits
+most from warm, nurturing influences — mentors, structured learning, and
+people who steady you. Avoid letting things get too dry or driven."}
 
-**What's NOT in the reading:**
-- 신살(神煞) detailed lookup, hidden stems (지장간) per branch, 12운성, 공망, 세운(year cycle) interaction. These can be added with deeper script support; current reading uses high-level 십신 + 합충 only.
+(Birth chart shown for reference, but explained, not just listed:)
+- Year of birth: {year_pillar} — {one short plain-language descriptor}
+- Month of birth: {month_pillar} — {descriptor}
+- Day of birth: {day_pillar} ← **this is your "core self"** ({plain element})
+- Hour of birth: {hour_pillar} — {descriptor}
+
 ```
 
 Star notation: `★★★★★` / `★★★★☆` / `★★★☆☆` / `★★☆☆☆` (5/4/3/2). No 1-star.
+Vary star distribution across categories. Average around 3.5.
+
+## Readability — both Korean AND English output
+
+The user has explicitly said the reading should be understandable. This is binding.
+
+**Forbidden in any output language:**
+- Untranslated 명리 jargon: 편관 / 정관 / 정인 / 편재 / 식상 / 비겁 / 살인상생 / 격국 / 용신 / 대운 / 십신 / 일주 / 신강 / 신약 / 중화 / 합·충·형·파·해
+- Naked 한자 stems and branches without an English plain descriptor: 戊, 甲, 申, 戌, etc. alone
+- Hexagram names in pure 한자 without explanation: 革, 泰, 否, 既濟, etc.
+- Symbols without naming the trigram: ☷ ☱ alone
+- Phrases like "월령에 통근하여", "지장간 투출", "왕상휴수사", "납음오행", "庚壬戊"
+
+**Required substitutions — describe the MEANING, not the syllables:**
+
+| Don't write | Do write |
+|---|---|
+| 편관 (Seven Killings) | "pressure energy — the kind that challenges and tests" |
+| 정관 | "structure energy — proper authority, recognition, order" |
+| 정인 | "nurturing support — mentors, learning, the protective kind of energy" |
+| 편재 | "windfall money — unexpected income, side opportunities" |
+| 정재 | "steady earned income, stable assets" |
+| 식상 | "self-expression — creativity, output, talent showing" |
+| 비겁 | "peer energy — friends, rivals, your sense of self among others" |
+| 살인상생 | "the pressure-into-strength pattern — when challenges actually build you up" |
+| 일간 / 일주 | "your core self" |
+| 신강 / 신약 / 중화 | "strong / weak / balanced chart" |
+| 격국 | "the main pattern of your chart" |
+| 용신 | "what helps you most" / "favorable energy" |
+| 대운 | "10-year life period" / "current decade" |
+| 진태양시 보정 | (omit — internal detail) |
+| 戊 (Yang Earth) | "Earth-type, the steady mountain kind" |
+| 甲 (Yang Wood) | "Wood-type, the upright tree kind" |
+| 革 hexagram | "the Revolution hexagram (about timely change)" |
+| ☷ over ☱ | "Earth above, Lake below — solid ground over open water" |
+| 합·충·형·파·해 | "no notable interaction" / "harmony" / "clash" / "friction" |
+| 庚 day, 申 month | (omit; just say what energy it brings) |
+
+**The test:** if a friend who has never heard of 사주 reads the output and asks "what does this word mean?" — you've failed. Every term should already be self-explanatory in context.
+
+**Birth chart pillars in the Life Reading section:** show them (people like seeing the actual characters), but always pair with a plain descriptor. Example: "Day of birth: 戊申 — your core self is Earth-type, steady and grounded."
 
 ## `quick` mode (no birth)
 
-If user chose `quick`: skip Life Destiny section. Today's Fortune uses generic interpretation. Reasoning section explains it's a generic reading and how to upgrade.
+Skip Life Reading. Today's Fortune uses generic interpretation.
 
 ## Variants & commands
 
-- `/destiny` — full three-section reading (auto profile)
-- `/destiny today` — only today's fortune section
-- `/destiny life` — only life destiny section
+- `/destiny` — full two-section reading (auto profile)
+- `/destiny today` — only today's fortune
+- `/destiny life` — only life reading
 - `/destiny reset` — `rm ~/.destiny/profile.json` and re-prompt
 - `/destiny show profile` — print stored profile
 - `/destiny in korean|japanese|chinese|spanish` — switch language
@@ -188,30 +196,22 @@ If user chose `quick`: skip Life Destiny section. Today's Fortune uses generic i
 
 ## Tone & content
 
-- **Specific over generic.** Always reference the actual 십신, 일주, hexagram, element. No "you are creative and resilient."
+- **Specific over generic.** Reference the actual energy of today + the user's actual chart shape — but in plain language. "Today's pushy energy meets your grounded nature" not "today's 편관 against your 戊土".
 - **Balanced.** Average ~3.5 stars; vary distribution. Never all 5.
-- **No doom.** No direct accident/illness/death/breakup predictions. "A day for caution in X" is the limit.
-- **No disclaimers.** No "just for fun." The Reasoning section provides the honesty.
-- **Total length** ≤ 70 lines. Today section ≤ 18, Life section ≤ 22, Reasoning ≤ 20.
+- **No doom.** No direct accident/illness/death/breakup predictions. "A day to take it easy on X" is the limit.
+- **No disclaimers.** No "just for fun".
+- **Total length** ≤ 35 lines. Today section ≤ 15, Life section ≤ 18.
+- **Warm tone.** This is fortune-telling, not a database printout.
 - **English default.** Switch on signal.
-- **English output must actually be readable in English.** A foreigner with zero exposure to 명리 should follow it. Concrete rules:
-  - Every Chinese character or 명리 term gets a **plain-English explanation in parentheses on first use** — not just a transliteration. "정관" alone is meaningless; "정관 (Direct Officer — the 'proper authority' pattern: career, structure, recognition)" is readable.
-  - Translate the *meaning*, not the syllables. "살인상생" → "the **pressure-into-strength pattern** — when the same forces that push you also feed your resilience". Not "the saljin-sangsaeng pattern".
-  - Stems and branches: write them as "戊 (Yang Earth)" or "甲 (Yang Wood)" — character + element + polarity. After the first use, the English ("Yang Earth") alone is fine.
-  - 십신 names: pair with the English shishen_meta.en the script provides. "편관 (Seven Killings — pressure, challenge, decisive moments)".
-  - Hexagram trigrams: name the element ("☷ Earth over ☱ Lake — solid ground meeting open expression"). Don't leave bare symbols.
-  - 격국 / 용신 / 대운: explain the concept the first time it appears ("대운 (10-year luck cycles — long-period rhythms in your chart)").
-  - **No raw jargon strings.** If you would write "you have 정관격 with 식상 투출", rewrite as "your chart's main structure is the Direct-Officer pattern (정관격 — career-and-order oriented), with strong outward-expression energy showing on the surface (식상 투출)".
-- **Korean output**: keep the 한자/한글 명리 terms terse — Korean readers know them. The plain-English unpacking rule applies to English (and other non-CJK languages) only.
 
 ## Common mistakes
 
-- **Skipping the Reasoning section** — never. It's mandatory.
+- **Including a "Reasoning" or "Sources" or "Stack" section** — REMOVED. Don't bring it back.
+- **Dumping raw 한자 / 명리 jargon in any language** — every term must be replaced with plain-language description.
+- **Listing the script's data fields raw** ("shishen_today_to_user_day_master: 편관") — translate everything.
 - **Blurring today and life** — keep them in separate sections with clear headers.
-- **Inventing pillars/hexagrams** — only script output.
+- **Inventing pillars/hexagrams** — only what the script returns.
 - **Asking for birth info when profile exists** — read profile first.
-- **Vague life claims** ("you'll have ups and downs") — useless. Anchor to specific 십신, element, or 대운 cycle.
-- **Identical star counts across categories** — vary it.
+- **Vague claims** ("you'll have ups and downs") — ground every line in the actual chart energy or hexagram message, just describe it in plain words.
+- **Identical star counts** — vary it.
 - **Defaulting Korean for English requests** — default English.
-- **Dumping raw 한자/명리 jargon in English output** — every term needs a plain-English unpacking on first use. "편관" alone is unreadable to a foreigner; "편관 (Seven Killings — pressure energy)" is.
-- **Forgetting `pip install lunar-python`** — run idempotently every call.
