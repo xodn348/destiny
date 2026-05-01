@@ -119,6 +119,27 @@ No external APIs. No scraped sites. Everything runs locally.
 - `/destiny in english|korean|japanese|chinese|spanish` — switch language
 - `/destiny born YYYY-MM-DD HH:MM <city> <m|f>` — one-off without saving
 - `/destiny quick` — generic daily, no personal data
+- `/destiny compat <partner birth> <city> <m|f>` — couple compatibility (궁합) reading using two charts
+- `/destiny hook on` / `/destiny hook off` — auto-run `/destiny` on every Claude Code session start (opt-in)
+
+## Auto-run on session start (optional)
+
+If you want `/destiny` to fire every time you launch Claude Code — like a morning paper — run `/destiny hook on` once. To turn it off, `/destiny hook off`. Both commands edit `~/.claude/settings.json` safely (your other hooks are preserved, and a backup is saved to `~/.claude/settings.json.destiny-backup` before the first install).
+
+If you'd rather wire it manually, add this to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [{"type": "command", "command": "claude --print '/destiny'"}]
+      }
+    ]
+  }
+}
+```
 
 ## Why this exists
 
@@ -132,6 +153,22 @@ Default output is English with every classical term unpacked into plain language
 - [`lunar-python`](https://github.com/6tail/lunar-python) (MIT) — pure-Python perpetual lunar calendar
 - I-Ching: King Wen ordering + Legge (1899) public-domain judgments
 - Claude Code plugin format
+
+## Safety & disclaimer
+
+**For entertainment only. No scientific basis. Not advice.**
+
+`destiny` is a personal entertainment project rooted in classical East Asian metaphysics (Four Pillars / I-Ching). The chart calculations are deterministic and the prose is written by Claude on top of that fixed data — but the **underlying system has no scientifically established predictive validity**, and the readings are not predictions of anything real.
+
+**This is not professional advice of any kind.** Specifically, nothing produced by this tool is or should be treated as: medical, psychological, psychiatric, financial, investment, legal, employment, relationship, or any other professional advice. Do not make life decisions based on a reading. Do not use it as a substitute for consulting a qualified professional or for talking to a real human in your life when something matters.
+
+**Mental-health crisis.** If you are in crisis or having thoughts of self-harm, please contact a qualified professional immediately. International directory of crisis lines: <https://findahelpline.com>.
+
+**Intended audience.** This tool is intended for adults who understand it is a recreational reading.
+
+**No warranty, no liability.** This software is provided "AS IS", without warranty of any kind, express or implied — see the LICENSE file for the full text. The author and contributors **disclaim all liability** for any direct, indirect, incidental, consequential, or other damages or harm — financial, emotional, relational, professional, or otherwise — arising out of or in connection with the use, reliance on, or inability to use this software or any reading it produces. By using this tool you agree that you do so **at your own risk and on your own discretion**.
+
+**Local laws.** Fortune-telling and divination are regulated in some jurisdictions. You are responsible for ensuring your use of this tool complies with the laws applicable to you.
 
 ## License
 

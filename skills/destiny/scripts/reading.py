@@ -283,7 +283,7 @@ def saju(birth_clock: datetime, longitude: float, sect: int, gender: str, time_u
         "day_master_polarity": GAN_ELEMENT[day_gan][1],
         "element_count": counts,
         "missing_elements": [k for k, v in counts.items() if v == 0],
-        "dominant_element": max(counts, key=counts.get),
+        "dominant_element": max(counts.items(), key=lambda kv: kv[1])[0],
         "month_branch": month_zhi,
         "season_of_birth": season,
         "season_dominant_element": SEASON_DOMINANT_ELEMENT[season],
@@ -315,6 +315,96 @@ def saju(birth_clock: datetime, longitude: float, sect: int, gender: str, time_u
         "day_master_polarity": GAN_ELEMENT[day_gan][1],
         "chart_summary": chart_summary,
         "da_yun": da_yun,
+    }
+
+
+def compat(chart_a: dict, chart_b: dict) -> dict:
+    a_day_gan = chart_a["pillars"]["day"]["gz"][0]
+    b_day_gan = chart_b["pillars"]["day"]["gz"][0]
+    a_day_zhi = chart_a["pillars"]["day"]["gz"][1]
+    b_day_zhi = chart_b["pillars"]["day"]["gz"][1]
+    a_year_zhi = chart_a["pillars"]["year"]["gz"][1]
+    b_year_zhi = chart_b["pillars"]["year"]["gz"][1]
+
+    # Reciprocal Ten-Gods read across day masters — classical 일주 궁합.
+    # B-as-seen-by-A reveals what role B plays in A's life; the reverse
+    # likewise. Both directions matter — asymmetry is the point.
+    ss_b_to_a = shishen_of(b_day_gan, a_day_gan)
+    ss_a_to_b = shishen_of(a_day_gan, b_day_gan)
+
+    year_br = branch_relation(a_year_zhi, b_year_zhi)
+    day_br  = branch_relation(a_day_zhi,  b_day_zhi)
+
+    a_counts = chart_a["chart_summary"]["element_count"]
+    b_counts = chart_b["chart_summary"]["element_count"]
+    a_missing = set(chart_a["chart_summary"]["missing_elements"])
+    b_missing = set(chart_b["chart_summary"]["missing_elements"])
+
+    complements = []
+    doubled = []
+    for el in ("Wood","Fire","Earth","Metal","Water"):
+        a_has = a_counts.get(el, 0)
+        b_has = b_counts.get(el, 0)
+        if el in a_missing and b_has >= 2:
+            complements.append({"element": el, "supplied_by": "B", "to": "A", "b_count": b_has})
+        if el in b_missing and a_has >= 2:
+            complements.append({"element": el, "supplied_by": "A", "to": "B", "a_count": a_has})
+        # Doubling already-dominant element is unfavorable — overflow → 신강 problem
+        if a_has >= 3 and b_has >= 2 and el == chart_a["chart_summary"]["dominant_element"]:
+            doubled.append({"element": el, "note": "A's dominant element reinforced by B"})
+        if b_has >= 3 and a_has >= 2 and el == chart_b["chart_summary"]["dominant_element"]:
+            doubled.append({"element": el, "note": "B's dominant element reinforced by A"})
+
+    return {
+        "day_master_interaction": {
+            "a_day_master": a_day_gan,
+            "b_day_master": b_day_gan,
+            "b_as_seen_by_a": {"shishen": ss_b_to_a, "meta": SHISHEN_META[ss_b_to_a]},
+            "a_as_seen_by_b": {"shishen": ss_a_to_b, "meta": SHISHEN_META[ss_a_to_b]},
+        },
+        "year_branch_compatibility": {
+            "a_year_branch": a_year_zhi,
+            "b_year_branch": b_year_zhi,
+            "relation": year_br,
+            "meta": BRANCH_META[year_br],
+            "scope": "띠 궁합 — broad social/family resonance",
+        },
+        "day_branch_compatibility": {
+            "a_day_branch": a_day_zhi,
+            "b_day_branch": b_day_zhi,
+            "relation": day_br,
+            "meta": BRANCH_META[day_br],
+            "scope": "일지 궁합 — intimate/spousal harmony, the most weighted branch read",
+        },
+        "five_element_complement": {
+            "a_counts": a_counts,
+            "b_counts": b_counts,
+            "a_missing": sorted(a_missing),
+            "b_missing": sorted(b_missing),
+            "complements": complements,
+            "doubled_dominants": doubled,
+        },
+        "_for_claude": (
+            "INTERPRET THIS AS A COUPLE-COMPATIBILITY READING (궁합) — not a fortune, "
+            "not a verdict. Cite the actual interactions found above (the specific shishen "
+            "each person plays for the other, the named branch relation, the elements one "
+            "supplies vs. doubles). Balance areas of natural harmony against areas of "
+            "friction — every pairing has both. Reciprocal day-master shishen is the "
+            "primary signal; day-branch relation is the next-most-weighted. NEVER predict "
+            "doom and NEVER recommend breaking up — couples reading is for mutual "
+            "self-understanding, not judgment. Keep it specific, warm, and useful."
+        ),
+    }
+
+
+def chart_brief(chart: dict) -> dict:
+    return {
+        "day_master": chart["day_master"],
+        "day_master_element": chart["day_master_element"],
+        "day_master_polarity": chart["day_master_polarity"],
+        "year_branch": chart["pillars"]["year"]["gz"][1],
+        "day_branch": chart["pillars"]["day"]["gz"][1],
+        "season_of_birth": chart["chart_summary"]["season_of_birth"],
     }
 
 
@@ -366,7 +456,59 @@ def main():
     p.add_argument("--gender", choices=["m", "f"], default="m")
     p.add_argument("--time-unknown", action="store_true",
                    help="Birth time unknown — skip hour pillar")
+    p.add_argument("--compat", action="store_true",
+                   help="Couple-compatibility mode (궁합). Requires --partner-birth.")
+    p.add_argument("--partner-birth",
+                   help="Partner's ISO birth datetime, local clock at birthplace")
+    p.add_argument("--partner-lon", type=float, default=None,
+                   help="Partner's birthplace longitude in °E (default Seoul 126.9784)")
+    p.add_argument("--partner-sect", type=int, default=None, choices=[1, 2],
+                   help="Partner's hour-pillar rule (default 2 = 야자시)")
+    p.add_argument("--partner-gender", choices=["m", "f"], default=None,
+                   help="Partner's gender (default f)")
+    p.add_argument("--partner-time-unknown", action="store_true",
+                   help="Partner's birth time unknown — skip hour pillar")
     args = p.parse_args()
+
+    if args.compat or args.partner_birth:
+        if not args.birth or not args.partner_birth:
+            print(json.dumps({
+                "error": "compat mode requires both --birth and --partner-birth",
+            }, ensure_ascii=False))
+            sys.exit(2)
+        defaults_used = {
+            "lon":    args.partner_lon    is None,
+            "sect":   args.partner_sect   is None,
+            "gender": args.partner_gender is None,
+        }
+        partner_lon    = args.partner_lon    if args.partner_lon    is not None else SEOUL_LON
+        partner_sect   = args.partner_sect   if args.partner_sect   is not None else 2
+        partner_gender = args.partner_gender if args.partner_gender is not None else "f"
+
+        birth_a = datetime.fromisoformat(args.birth)
+        if args.time_unknown:
+            birth_a = birth_a.replace(hour=12, minute=0)
+        chart_a = saju(birth_a, args.lon, args.sect, args.gender, args.time_unknown)
+
+        birth_b = datetime.fromisoformat(args.partner_birth)
+        if args.partner_time_unknown:
+            birth_b = birth_b.replace(hour=12, minute=0)
+        chart_b = saju(birth_b, partner_lon, partner_sect, partner_gender,
+                       args.partner_time_unknown)
+
+        out = {
+            "mode": "compat",
+            "now": datetime.now().isoformat(),
+            "person_a": chart_brief(chart_a),
+            "person_b": chart_brief(chart_b),
+            "compat": compat(chart_a, chart_b),
+        }
+        if any(defaults_used.values()):
+            out["_partner_defaults_used"] = {
+                k: v for k, v in defaults_used.items() if v
+            }
+        print(json.dumps(out, ensure_ascii=False, indent=2))
+        return
 
     now = datetime.now()
     here = Path(__file__).parent

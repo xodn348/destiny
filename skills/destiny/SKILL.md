@@ -222,6 +222,123 @@ Skip Life Reading. Today's Fortune uses generic interpretation.
 - `/destiny in korean|japanese|chinese|spanish` — switch language
 - `/destiny born YYYY-MM-DD HH:MM <city> <m|f>` — one-off without saving
 - `/destiny quick` — generic daily, no personal data
+- `/destiny compat <partner birth as ISO> <partner city> <partner m|f>` — couple compatibility (궁합) reading using two charts
+- `/destiny hook on` — install a Claude Code SessionStart hook so `/destiny` auto-runs each new session
+- `/destiny hook off` — remove the destiny SessionStart hook (other hooks preserved)
+
+## /destiny compat — couple compatibility (궁합)
+
+When the user invokes `/destiny compat <partner-info>`:
+
+1. Resolve the user's own profile from `~/.destiny/profile.json` (already saved).
+2. Parse the partner's info from the command. Required: birth date+time. Optional: city (→ longitude lookup table above), gender. Defaults if missing: longitude 126.9784 (Seoul), gender `f`, sect 2.
+3. Run the script in compat mode:
+   ```bash
+   python3 "$CLAUDE_PLUGIN_ROOT/skills/destiny/scripts/reading.py" \
+     --birth "<user birth>" --lon <user lon> --gender <user g> --sect 2 \
+     --partner-birth "<partner birth>" --partner-lon <partner lon> --partner-gender <partner g> --partner-sect 2 \
+     --compat
+   ```
+4. Output sections (in this order, prose-rich, no jargon — same readability rules as the daily reading):
+
+```
+💞 **Compatibility reading — {your name or "you"} × {partner name or "your partner"}**
+
+{**Opening (2–3 sentences):** name the core dynamic of the pair using one
+vivid image. "You're the patient mountain; they're the moving river — you
+hold shape, they reshape what passes through you." Reference both day
+masters in plain language, no bare 한자.}
+
+**How you see each other** *(2–3 sentences):* describe what each person
+brings to the other, derived from the reciprocal Ten Gods relationship in
+the script's `compat.day_master_interaction`. Translate every term into
+plain language ("they show up in your life as a steadying authority — the
+kind that helps you focus rather than the kind that pressures you").
+
+**Where you run together easily** *(2–3 sentences):* describe the harmonies
+the script returned (year-branch and day-branch interactions marked
+favorable, plus element-complement signals). Concrete examples — what
+this feels like in daily life.
+
+**Where you'll need to translate for each other** *(2–3 sentences):*
+describe the friction signals — clashes, doubled-dominant elements,
+mismatched element distributions. Frame as differences to navigate,
+NOT as compatibility verdicts. Never tell people to break up. Never
+predict the relationship's outcome.
+
+**The shape of you together** *(2–3 sentences):* close with the overall
+feel — what kind of pair you make, what you're best at as a unit, what
+you'll ask of each other to keep growing.
+```
+
+**Forbidden in compat readings:**
+- "You shouldn't be together" / "this won't work" / any breakup-predicting language
+- Numerical "compatibility scores" (e.g. "78% match") — too reductive, classical 궁합 doesn't work that way
+- Interpreting the chart as fate. Frame as patterns and tendencies, never as locked outcomes.
+- Same readability rules apply: no untranslated 명리 jargon, no bare 한자.
+
+## /destiny hook — auto-run on Claude Code start
+
+**Opt-in only.** Don't suggest this proactively to users — only execute when they invoke `/destiny hook on`.
+
+### `hook on`
+
+```bash
+SETTINGS=~/.claude/settings.json
+mkdir -p ~/.claude
+[ -f "$SETTINGS" ] || echo '{}' > "$SETTINGS"
+cp "$SETTINGS" "${SETTINGS}.destiny-backup"
+python3 -c "
+import json, pathlib
+p = pathlib.Path.home() / '.claude' / 'settings.json'
+data = json.loads(p.read_text() or '{}')
+hooks = data.setdefault('hooks', {})
+session_start = hooks.setdefault('SessionStart', [])
+existing = [h for h in session_start if h.get('_destiny') is True]
+if not existing:
+    session_start.append({
+        '_destiny': True,
+        'matcher': '*',
+        'hooks': [{'type': 'command', 'command': \"claude --print '/destiny'\"}]
+    })
+    p.write_text(json.dumps(data, indent=2))
+    print('Installed destiny SessionStart hook. Backup saved to ~/.claude/settings.json.destiny-backup')
+else:
+    print('destiny SessionStart hook already installed.')
+"
+```
+
+Then tell the user: "Done. Every new Claude Code session will now auto-run `/destiny`. Disable with `/destiny hook off`."
+
+### `hook off`
+
+```bash
+python3 -c "
+import json, pathlib
+p = pathlib.Path.home() / '.claude' / 'settings.json'
+if not p.exists():
+    print('No settings file — nothing to remove.')
+    raise SystemExit
+data = json.loads(p.read_text() or '{}')
+hooks = data.get('hooks', {})
+session_start = hooks.get('SessionStart', [])
+before = len(session_start)
+hooks['SessionStart'] = [h for h in session_start if not h.get('_destiny')]
+if not hooks['SessionStart']:
+    hooks.pop('SessionStart', None)
+if not hooks:
+    data.pop('hooks', None)
+p.write_text(json.dumps(data, indent=2))
+removed = before - len(hooks.get('SessionStart', []))
+print(f'Removed {removed} destiny hook(s). Other hooks preserved.')
+"
+```
+
+### Safety rules
+
+- Always create `~/.claude/settings.json.destiny-backup` before modifying on `hook on`
+- Identify destiny-installed hooks by the `_destiny: true` marker so removal never touches the user's other hooks
+- Never enable the hook without explicit user invocation of `/destiny hook on`
 
 ## Tone & content
 
