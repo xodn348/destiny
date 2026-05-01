@@ -50,6 +50,22 @@ GAN_ELEMENT = {
 }
 ELEMENT_GENERATES = {"Wood":"Fire","Fire":"Earth","Earth":"Metal","Metal":"Water","Water":"Wood"}
 ELEMENT_CONTROLS  = {"Wood":"Earth","Earth":"Water","Water":"Fire","Fire":"Metal","Metal":"Wood"}
+ZHI_ELEMENT = {
+    "子":"Water","丑":"Earth","寅":"Wood","卯":"Wood",
+    "辰":"Earth","巳":"Fire","午":"Fire","未":"Earth",
+    "申":"Metal","酉":"Metal","戌":"Earth","亥":"Water",
+}
+SEASON_OF_BRANCH = {
+    "寅":"spring","卯":"spring","辰":"spring (late)",
+    "巳":"summer","午":"summer","未":"summer (late)",
+    "申":"autumn","酉":"autumn","戌":"autumn (late)",
+    "亥":"winter","子":"winter","丑":"winter (late)",
+}
+SEASON_DOMINANT_ELEMENT = {
+    "spring":"Wood","summer":"Fire","autumn":"Metal","winter":"Water",
+    "spring (late)":"Earth-bridge → Wood waning","summer (late)":"Earth-bridge → Fire waning",
+    "autumn (late)":"Earth-bridge → Metal waning","winter (late)":"Earth-bridge → Water waning",
+}
 ELEMENT_COLOR = {
     "Wood":  "Forest green",
     "Fire":  "Crimson red",
@@ -233,6 +249,54 @@ def saju(birth_clock: datetime, longitude: float, sect: int, gender: str, time_u
         pass
 
     day_gan = pillars["day"]["gz"][0]
+    day_element = GAN_ELEMENT[day_gan][0]
+
+    # Element distribution across all 8 chars (gan + zhi main element)
+    counts = {"Wood":0,"Fire":0,"Earth":0,"Metal":0,"Water":0}
+    for k in ("year","month","day","hour"):
+        gz = pillars[k]["gz"]
+        if gz == "?" or len(gz) != 2:
+            continue
+        counts[GAN_ELEMENT[gz[0]][0]] += 1
+        counts[ZHI_ELEMENT[gz[1]]] += 1
+
+    month_zhi = pillars["month"]["gz"][1]
+    season = SEASON_OF_BRANCH[month_zhi]
+
+    # Rough day master strength: same-element + generating-element count
+    generates_self_el = next(g for g, t in ELEMENT_GENERATES.items() if t == day_element)
+    supportive = counts[day_element] + counts[generates_self_el]
+    if supportive >= 5:
+        strength = "very strong (극신강)"
+    elif supportive == 4:
+        strength = "strong (신강)"
+    elif supportive == 3:
+        strength = "balanced (중화)"
+    elif supportive == 2:
+        strength = "weak (신약)"
+    else:
+        strength = "very weak (극신약)"
+
+    chart_summary = {
+        "day_master": day_gan,
+        "day_master_element": day_element,
+        "day_master_polarity": GAN_ELEMENT[day_gan][1],
+        "element_count": counts,
+        "missing_elements": [k for k, v in counts.items() if v == 0],
+        "dominant_element": max(counts, key=counts.get),
+        "month_branch": month_zhi,
+        "season_of_birth": season,
+        "season_dominant_element": SEASON_DOMINANT_ELEMENT[season],
+        "supportive_count_for_day_master": supportive,
+        "day_master_strength_rough": strength,
+        "_note_for_claude": (
+            "Use this for LIFE-READING context. Refine with classical 월령 분석 "
+            "(왕상휴수사), hidden stems of branches (지장간), and 격국 추정 "
+            "based on month branch + relationships. Estimate 용신 from strength "
+            "+ missing/excess elements + season."
+        ),
+    }
+
     return {
         "input": {
             "birth_clock_local": birth_clock.isoformat(),
@@ -247,8 +311,9 @@ def saju(birth_clock: datetime, longitude: float, sect: int, gender: str, time_u
         },
         "pillars": pillars,
         "day_master": day_gan,
-        "day_master_element": GAN_ELEMENT[day_gan][0],
+        "day_master_element": day_element,
         "day_master_polarity": GAN_ELEMENT[day_gan][1],
+        "chart_summary": chart_summary,
         "da_yun": da_yun,
     }
 

@@ -1,28 +1,23 @@
 ---
 name: destiny
-description: Use when the user asks for today's fortune, daily reading, horoscope, destiny, hexagram, I-Ching, 운세, 사주, or invokes /destiny. Produces a personalized DAILY fortune (today only — not a life reading) by computing real 사주 + 일진 + 매화역수 hexagram with lunar-python, then having Claude apply 명리 knowledge to interpret the daily interaction. Stores the user's birth profile after first use so future calls are instant. Default English; switches to user's language on request.
+description: Use when the user asks for a fortune reading, daily destiny, life reading, horoscope, hexagram, I-Ching, 운세, 사주, 명리, or invokes /destiny. Produces THREE sections in one reading — (1) today's daily fortune, (2) full life destiny analysis from the user's 사주, (3) reasoning footnotes that explain what data and 명리 logic backed each conclusion. Computes real 사주 + 일진 + 매화역수 hexagram via lunar-python, then Claude applies its 명리 knowledge to interpret. Stores birth profile after first use. Default English.
 ---
 
-# Destiny — Today's Fortune (오늘의 운세)
+# Destiny — Today + Life Reading + Reasoning
 
-This skill produces **today's daily fortune** for the user — personalized by their real birth chart, but strictly limited to today's reading.
+`/destiny` produces a complete reading in three sections, in this order:
 
-A Python script computes the deterministic facts (사주 8 characters, today's 일진, 십신 between today and the user's day master, 합/충/형 branch relation, an I-Ching hexagram). Then **you (Claude)** apply your 명리 knowledge to those facts to assign category stars and write the reading.
+1. **🔮 Today's Fortune** — daily 5-category stars + hexagram
+2. **🌌 Life Destiny** — character, life arc, current 대운, key themes from the full 사주
+3. **📚 Reasoning** — what data and 명리 logic produced each conclusion (transparent footnotes)
 
-## STRICT FRAME — Today's fortune only
+The point of section 3 is honesty: every claim above should be traceable to either (a) the script's deterministic output or (b) a specific 명리 principle Claude is applying. No mystery, no "trust me."
 
-This is **DAILY FORTUNE for today**. Not a life reading. Not a personality analysis. Not a "your sign is..." horoscope.
+## Iron rules
 
-- ✅ "Today, with this 일진 against your 일주, the 상관 energy of the day means..."
-- ❌ "You are a Water person who tends to be introverted and creative throughout life..."
-- ❌ "Your destiny is to..."
-- ❌ Long character analysis based on the full chart.
-
-Even when the user has shared their birth info, the ONLY job is to read **today × user**. The birth chart is referenced as the *anchor* for today's interpretation — never as the subject.
-
-## Iron rule
-
-**Never invent stems, branches, hexagrams, or interaction labels.** Use only what the script returns. If the script fails, say so plainly.
+- **Never invent stems, branches, hexagrams, or interaction labels.** Only use what the script returns.
+- **Always include the Reasoning section.** It's not optional. It's what makes this skill different from a horoscope.
+- **Distinguish today vs life clearly** — never blur them. Today's section talks about today only. Life section talks about lifelong patterns.
 
 ## Workflow
 
@@ -30,21 +25,18 @@ Even when the user has shared their birth info, the ONLY job is to read **today 
 
 ```bash
 PROFILE=~/.destiny/profile.json
-if [ -f "$PROFILE" ]; then
-    cat "$PROFILE"   # read birth/lon/gender
-fi
+[ -f "$PROFILE" ] && cat "$PROFILE"
 ```
 
-If profile exists → skip to Step 3 with the stored values. Don't re-ask.
+Profile exists → skip to Step 3.
 
-### Step 2 — first-time setup (only if no profile)
+### Step 2 — first-time setup
 
-Ask the user once, conversationally:
+> "Hi! First time. To give you a real reading I'll save your birth info once.
+> Need: **birth date, time (24h), city, gender (m/f)**.
+> Or type `quick` for a generic daily-only reading without personal info."
 
-> "Hi! First time. To give you a real personalized daily fortune I'll save your birth info once. Need: **birth date, time (24h), city, and gender (m/f)**.
-> Or type `quick` for a generic daily reading without personal info."
-
-After they reply, save to `~/.destiny/profile.json`:
+Save:
 
 ```bash
 mkdir -p ~/.destiny
@@ -60,22 +52,18 @@ cat > ~/.destiny/profile.json <<EOF
 EOF
 ```
 
-City → longitude lookup (use one or estimate):
+City → longitude:
 
 | City | Lon | City | Lon |
 |---|---|---|---|
 | Seoul | 126.98 | Tokyo | 139.69 |
 | Busan | 129.08 | Osaka | 135.50 |
-| Jeju  | 126.52 | Beijing | 116.41 |
+| Jeju | 126.52 | Beijing | 116.41 |
 | New York | -74.01 | London | -0.13 |
-| Los Angeles | -118.24 | Paris | 2.35 |
+| LA | -118.24 | Paris | 2.35 |
 | Sydney | 151.21 | Singapore | 103.82 |
 
-For unlisted cities, infer from general knowledge or ask the user.
-
-If the user typed `quick`, save nothing and run the script without `--birth`.
-
-### Step 3 — run the reading
+### Step 3 — run script
 
 ```bash
 python3 -m pip install --quiet lunar-python 2>/dev/null
@@ -83,113 +71,138 @@ python3 "$CLAUDE_PLUGIN_ROOT/skills/destiny/scripts/reading.py" \
     --birth "<birth>" --lon <lon> --gender <gender> --sect <sect>
 ```
 
-(Without `--birth` if `quick` mode.)
+JSON returned:
+- `today` — date, day pillar, day element
+- `personal` — pillars, day_master, **chart_summary** (element count, season, day master strength, missing/dominant elements), da_yun (8 cycles)
+- `interaction` — 십신 of today→user-day-master + branch relation, with metadata
+- `iching` — hexagram via 매화역수
+- `lucky` — number/color/direction (computed)
 
-If `$CLAUDE_PLUGIN_ROOT` isn't available, locate the script under the plugin install path.
+### Step 4 — write the three-section reading
 
-### Step 4 — interpret and present
-
-The script returns JSON with:
-
-- `today` — today's date + day pillar + element
-- `personal` (if birth provided) — 사주 8 chars, day master, 대운
-- `interaction` — 십신 of today→user-day-master + branch relation, with `shishen_meta` (domains, watch areas, tendency) and `branch_meta` (tendency, note). The `_for_claude` field reminds you of the framing.
-- `iching` — today's hexagram by 매화역수
-- `lucky` — number / color / direction (already computed; do not change)
-
-**You assign the 5-category stars (2–5).** Use:
-1. The shishen's `tendency` (very favorable / favorable / neutral / mixed / challenging) as the baseline tilt.
-2. The `domains` to identify which of the 5 categories the day's energy emphasizes.
-3. The `watch` areas to identify which categories take a hit.
-4. The branch `tendency` as a global modifier (삼합/육합 lifts; 충/형 weighs down).
-5. The hexagram judgment as a tone overlay.
-6. Your knowledge of 명리: how this specific pair interacts (생/극/비화), seasonal context, day-master strength.
-7. Vary the distribution — never all five categories the same. Stay in 2–5 range. Average ~3.5.
-
-### Output format (English default)
+## Output format (English default)
 
 ```
 🔮 **Today's Fortune — {date}**
 
-Today is **{today_day_pillar} day** ({day_element}). Against your {user_day_pillar}
-day master, today brings **{shishen}** energy — {1 line: what this means today}.
-{Branch interaction line if 합/충/형 is present; skip if 무관계.}
+Today is **{today_day_pillar} day** ({today.day_element}). Against your
+{user_day_pillar} day master, today brings **{shishen}** energy.
+{1 line: branch relation if 합/충/형, skip if 무관계.}
 
-**⭐ Overall** {stars}
-{1–2 sentences. Today only.}
-
-**💕 Love** {stars}
-{1 sentence. Today.}
-
-**💰 Money** {stars}
-{1 sentence. Today.}
-
-**💼 Career & Studies** {stars}
-{1 sentence. Today.}
-
-**🌿 Health** {stars}
-{1 sentence. Today.}
+**⭐ Overall** {stars}      {1 line, today only}
+**💕 Love** {stars}         {1 line}
+**💰 Money** {stars}        {1 line}
+**💼 Career** {stars}       {1 line}
+**🌿 Health** {stars}       {1 line}
 
 **☯ Hexagram for this moment**
-{iching.num}. {iching.en} ({iching.ko} · {iching.zh}) — moving line {iching.moving_line}
+{num}. {en} ({ko} · {zh}) — moving line {moving_line}
 {upper_symbol} over {lower_symbol}
-"{iching.judgment}"
-{1–2 sentences applying the hexagram TO TODAY (not to the user's life path).}
+"{judgment}"
+{1–2 sentences applying to TODAY only.}
+
+🍀 Lucky number: {n}    🎨 {color}    🧭 {direction}
+✨ "{≤8 words}"
 
 ---
-🍀 Lucky number: {lucky.number}
-🎨 Lucky color: {lucky.color}
-🧭 Lucky direction: {lucky.direction}
-✨ Words for today: "{≤8 words distilled}"
+
+🌌 **Your Life Destiny (전체 운명)**
+
+**Birth chart (사주팔자)**
+- Year   {year.gz} ({ko}, {nayin})
+- Month  {month.gz} ({ko}, {nayin}) ← Month branch {month_branch} = {season_of_birth}
+- Day    {day.gz} ({ko}, {nayin}) ← **Day master {day_master} ({day_master_element}, {polarity}, {strength})**
+- Hour   {hour.gz} ({ko}, {nayin})
+
+Element distribution: 木{Wood} 火{Fire} 土{Earth} 金{Metal} 水{Water}
+Dominant: {dominant_element} · Missing: {missing_elements joined or "none"}
+
+**Character (성향)**
+{2–3 sentences. Use day master + element distribution + dominant 십신 (year_gan/month_gan from saju.shishen).
+Apply your 명리 knowledge — this is a lifelong character read, not today.
+Anchor every claim to a specific element or 십신 you can name.}
+
+**Life arc (인생 흐름)**
+{2–3 sentences walking through the 대운 cycles — early life (first 1–2 cycles),
+mid-life (3rd–5th cycles), later life (6th+). Note transitions where the
+ganzhi element of the cycle shifts dramatically.}
+
+**Current 10-year cycle**
+{Find the da_yun whose start_year ≤ today's year < next start_year.}
+{ganzhi} ({ko}), age {start_age}–{next.start_age - 1}
+{2 sentences on the cycle's element vs day master, how it supports or pressures.}
+
+**Estimated 용신 (favorable element)**
+{Claude's reasoning. If day master is strong → reduce/drain via 식상/재성/관성.
+If weak → support via 인성/비겁. Name the element + give 1 sentence why.}
+
+**Estimated 격국 (chart structure)**
+{Claude's best guess: 정관격, 식신격, 편재격, 종왕격, etc., based on month branch
+and dominant 십신. 1 sentence why.}
+
+---
+
+📚 **Reasoning (근거)**
+
+**Today's stars — what determined them:**
+- The shishen of today's day stem ({today.day_gan}) against your day master ({day_master}) is **{shishen}**, which classical 명리 associates with {shishen_meta.domains joined}. Tendency: {shishen_meta.tendency}.
+- Branch relation between today's {today.day_zhi} and your {user_day_zhi}: {branch_relation}. Tendency: {branch_meta.tendency}.
+- {Each star score gets 1 short justification: e.g. "Money 4★ — 편재 favors windfall income, but no 삼합 to amplify"}.
+
+**Life-reading sources:**
+- Day master strength estimate ({strength}) is from element distribution: {supportive_count_for_day_master} of 8 chars support your {day_master_element} self. Refined by 월령 ({month_branch} = {season_dominant_element} season).
+- Character read draws on {day_master_element} day master archetype + dominant {dominant_element} influence + month-stem 십신 ({saju.shishen.month_gan}).
+- 용신 reasoning: {brief — strong/weak day master + missing/excess elements + season}.
+- 격국 reasoning: {brief — month branch hidden stem + transparent stem in chart}.
+- 대운 transitions are deterministic from birth (gender + year stem polarity → forward/backward cycle).
+
+**Hexagram method:**
+- 매화역수 시점법 — lunar 연(year branch index {y}) + 월({m}) + 일({d}) [+ user salt {salt}] → upper trigram. + 시({h}) → lower trigram. Sum mod 6 → moving line. Hexagram lookup from King Wen ordering, judgment text from James Legge (1899).
+
+**Stack:**
+- 사주 8 chars: lunar-python (real 만세력) with true-solar-time correction ({offset_min} min for longitude {lon}), DST adjustment, 야자시 rule.
+- 십신 + 합충형: classical 60갑자 lookup tables in script.
+- Star judgments + character reading + 용신/격국 estimates: Claude applying 명리 knowledge from training data (자평진전, 적천수, modern 명리 references) — not a hand-tuned numeric table.
+- Daily randomness: zero. Same person + same date = same script output. The prose differs each call (LLM generation).
+
+**What's NOT in the reading:**
+- 신살(神煞) detailed lookup, hidden stems (지장간) per branch, 12운성, 공망, 세운(year cycle) interaction. These can be added with deeper script support; current reading uses high-level 십신 + 합충 only.
 ```
 
 Star notation: `★★★★★` / `★★★★☆` / `★★★☆☆` / `★★☆☆☆` (5/4/3/2). No 1-star.
 
-## `quick` mode (no birth info)
+## `quick` mode (no birth)
 
-If `quick` was chosen: skip the personal reading. The script's `_for_claude` field tells you to write a generic daily based on today's day pillar + hexagram. Output:
-
-```
-🔮 Today's Fortune — {date}
-
-The day is **{day_pillar}** — {day_element} energy. {1–2 sentences on the day's general tone.}
-
-**☯ Hexagram for this moment**
-{number} {name}
-{judgment + 1–2 sentence interpretation}
-
-🍀 Lucky number: {n}    🎨 {color}    🧭 {direction}
-
-✨ "{words}"
-
-(For a personalized reading with five-category stars, run `/destiny reset` then provide your birth info.)
-```
+If user chose `quick`: skip Life Destiny section. Today's Fortune uses generic interpretation. Reasoning section explains it's a generic reading and how to upgrade.
 
 ## Variants & commands
 
-- `/destiny` — today's fortune (auto profile)
-- `/destiny reset` — delete saved profile (`rm ~/.destiny/profile.json`) and re-prompt
+- `/destiny` — full three-section reading (auto profile)
+- `/destiny today` — only today's fortune section
+- `/destiny life` — only life destiny section
+- `/destiny reset` — `rm ~/.destiny/profile.json` and re-prompt
 - `/destiny show profile` — print stored profile
 - `/destiny in korean|japanese|chinese|spanish` — switch language
-- `/destiny born YYYY-MM-DD HH:MM <city> <m|f>` — one-off reading without saving
+- `/destiny born YYYY-MM-DD HH:MM <city> <m|f>` — one-off without saving
 - `/destiny quick` — generic daily, no personal data
 
-## Tone & content rules
+## Tone & content
 
-- **TODAY only.** Never analyze the user's whole life, personality, or destiny path. The full sajupallja is shown only as a reference anchor for today's reading.
-- **Specific.** Reference the actual 십신, the actual hexagram judgment, the actual day pillar. No "you are creative" platitudes.
+- **Specific over generic.** Always reference the actual 십신, 일주, hexagram, element. No "you are creative and resilient."
 - **Balanced.** Average ~3.5 stars; vary distribution. Never all 5.
-- **No doom.** No direct predictions of accident/illness/death/breakup. "A day for caution in X" is the limit.
-- **No disclaimers.** No "just for fun" or "this isn't real."
-- **Concise.** Total ≤ 22 lines.
-- **Foreigner-friendly default.** English unless user signals otherwise. Hexagram + element are universally interesting; deeper 명리 jargon stays minimal.
+- **No doom.** No direct accident/illness/death/breakup predictions. "A day for caution in X" is the limit.
+- **No disclaimers.** No "just for fun." The Reasoning section provides the honesty.
+- **Total length** ≤ 70 lines. Today section ≤ 18, Life section ≤ 22, Reasoning ≤ 20.
+- **English default.** Switch on signal.
+- **Foreigner-friendly.** Always provide both 한자 and English/한글 transliteration on first reference of any term.
 
 ## Common mistakes
 
-- **Doing a life reading instead of a daily one** — the most likely mistake. The script gives you the user's full chart as anchor data, not as the subject. Stay on TODAY.
-- **Asking for birth info when profile already exists** — read the profile first. Always.
-- **Inventing pillars / hexagrams / 십신** — only what the script returns.
-- **All five categories at the same star count** — vary it.
-- **Disclaimers** — never.
-- **Defaulting to Korean for English requests** — default is English; switch only on signal.
-- **Forgetting `pip install lunar-python`** — run idempotently every invocation.
+- **Skipping the Reasoning section** — never. It's mandatory.
+- **Blurring today and life** — keep them in separate sections with clear headers.
+- **Inventing pillars/hexagrams** — only script output.
+- **Asking for birth info when profile exists** — read profile first.
+- **Vague life claims** ("you'll have ups and downs") — useless. Anchor to specific 십신, element, or 대운 cycle.
+- **Identical star counts across categories** — vary it.
+- **Defaulting Korean for English requests** — default English.
+- **Forgetting `pip install lunar-python`** — run idempotently every call.
