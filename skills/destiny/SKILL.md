@@ -194,7 +194,15 @@ If user chose `quick`: skip Life Destiny section. Today's Fortune uses generic i
 - **No disclaimers.** No "just for fun." The Reasoning section provides the honesty.
 - **Total length** ≤ 70 lines. Today section ≤ 18, Life section ≤ 22, Reasoning ≤ 20.
 - **English default.** Switch on signal.
-- **Foreigner-friendly.** Always provide both 한자 and English/한글 transliteration on first reference of any term.
+- **English output must actually be readable in English.** A foreigner with zero exposure to 명리 should follow it. Concrete rules:
+  - Every Chinese character or 명리 term gets a **plain-English explanation in parentheses on first use** — not just a transliteration. "정관" alone is meaningless; "정관 (Direct Officer — the 'proper authority' pattern: career, structure, recognition)" is readable.
+  - Translate the *meaning*, not the syllables. "살인상생" → "the **pressure-into-strength pattern** — when the same forces that push you also feed your resilience". Not "the saljin-sangsaeng pattern".
+  - Stems and branches: write them as "戊 (Yang Earth)" or "甲 (Yang Wood)" — character + element + polarity. After the first use, the English ("Yang Earth") alone is fine.
+  - 십신 names: pair with the English shishen_meta.en the script provides. "편관 (Seven Killings — pressure, challenge, decisive moments)".
+  - Hexagram trigrams: name the element ("☷ Earth over ☱ Lake — solid ground meeting open expression"). Don't leave bare symbols.
+  - 격국 / 용신 / 대운: explain the concept the first time it appears ("대운 (10-year luck cycles — long-period rhythms in your chart)").
+  - **No raw jargon strings.** If you would write "you have 정관격 with 식상 투출", rewrite as "your chart's main structure is the Direct-Officer pattern (정관격 — career-and-order oriented), with strong outward-expression energy showing on the surface (식상 투출)".
+- **Korean output**: keep the 한자/한글 명리 terms terse — Korean readers know them. The plain-English unpacking rule applies to English (and other non-CJK languages) only.
 
 ## Common mistakes
 
@@ -205,4 +213,5 @@ If user chose `quick`: skip Life Destiny section. Today's Fortune uses generic i
 - **Vague life claims** ("you'll have ups and downs") — useless. Anchor to specific 십신, element, or 대운 cycle.
 - **Identical star counts across categories** — vary it.
 - **Defaulting Korean for English requests** — default English.
+- **Dumping raw 한자/명리 jargon in English output** — every term needs a plain-English unpacking on first use. "편관" alone is unreadable to a foreigner; "편관 (Seven Killings — pressure energy)" is.
 - **Forgetting `pip install lunar-python`** — run idempotently every call.
