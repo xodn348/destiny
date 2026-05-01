@@ -24,14 +24,44 @@
   <!-- Backdrop -->
   <rect x="40" y="70" width="720" height="420" fill="url(#bg)"/>
 
-  <!-- Floating hexagram symbols (subtle background) -->
-  <g fill="#d4b06a" opacity="0.20" font-family="sans-serif" font-size="22">
-    <text x="180" y="110">☷</text>
-    <text x="640" y="370">☱</text>
-    <text x="80"  y="280">☵</text>
-    <text x="720" y="220">☰</text>
-    <text x="520" y="80">☴</text>
-    <text x="270" y="60">☶</text>
+  <!-- Floating trigram symbols drawn as paths (font-independent) -->
+  <g stroke="#d4b06a" stroke-width="1.6" opacity="0.25" stroke-linecap="round">
+    <!-- ☷ Earth (3 broken) at (180,110) -->
+    <g transform="translate(180,110)">
+      <line x1="-9" y1="-6" x2="-2" y2="-6"/><line x1="2" y1="-6" x2="9" y2="-6"/>
+      <line x1="-9" y1="0"  x2="-2" y2="0"/> <line x1="2" y1="0"  x2="9" y2="0"/>
+      <line x1="-9" y1="6"  x2="-2" y2="6"/> <line x1="2" y1="6"  x2="9" y2="6"/>
+    </g>
+    <!-- ☱ Lake (broken on top) at (640,370) -->
+    <g transform="translate(640,370)">
+      <line x1="-9" y1="-6" x2="-2" y2="-6"/><line x1="2" y1="-6" x2="9" y2="-6"/>
+      <line x1="-9" y1="0"  x2="9" y2="0"/>
+      <line x1="-9" y1="6"  x2="9" y2="6"/>
+    </g>
+    <!-- ☵ Water (broken-solid-broken) at (80,280) -->
+    <g transform="translate(80,280)">
+      <line x1="-9" y1="-6" x2="-2" y2="-6"/><line x1="2" y1="-6" x2="9" y2="-6"/>
+      <line x1="-9" y1="0"  x2="9" y2="0"/>
+      <line x1="-9" y1="6"  x2="-2" y2="6"/> <line x1="2" y1="6"  x2="9" y2="6"/>
+    </g>
+    <!-- ☰ Heaven (3 solid) at (720,220) -->
+    <g transform="translate(720,220)">
+      <line x1="-9" y1="-6" x2="9" y2="-6"/>
+      <line x1="-9" y1="0"  x2="9" y2="0"/>
+      <line x1="-9" y1="6"  x2="9" y2="6"/>
+    </g>
+    <!-- ☴ Wind (broken on bottom) at (520,80) -->
+    <g transform="translate(520,80)">
+      <line x1="-9" y1="-6" x2="9" y2="-6"/>
+      <line x1="-9" y1="0"  x2="9" y2="0"/>
+      <line x1="-9" y1="6"  x2="-2" y2="6"/> <line x1="2" y1="6"  x2="9" y2="6"/>
+    </g>
+    <!-- ☶ Mountain (solid on top) at (270,60) -->
+    <g transform="translate(270,60)">
+      <line x1="-9" y1="-6" x2="9" y2="-6"/>
+      <line x1="-9" y1="0"  x2="-2" y2="0"/> <line x1="2" y1="0"  x2="9" y2="0"/>
+      <line x1="-9" y1="6"  x2="-2" y2="6"/> <line x1="2" y1="6"  x2="9" y2="6"/>
+    </g>
   </g>
 
   <!-- Right-side hanging lantern -->
