@@ -76,68 +76,97 @@ python3 "$CLAUDE_PLUGIN_ROOT/skills/destiny/scripts/reading.py" \
 
 Use the script JSON. Do not echo raw fields. Translate everything into plain language.
 
-## Output format
+## Output format — write as PROSE, not bulleted database rows
+
+The reading must feel like something a thoughtful, warm fortune-teller would say to you over tea. Not a database dump. Not a five-line bullet list with star scores. Real sentences that flow into each other, with concrete imagery and grounded specifics.
+
+### Today's Fortune
 
 ```
-🔮 **Today's Fortune — {date in friendly format, e.g. "Thursday, April 30 2026"}**
+🔮 **Today's Fortune — {date in warm format, e.g. "목요일, 4월 30일"}**
 
-{1–2 sentences in plain language describing the day's overall mood and what
-the day's energy means specifically for THIS user. Do not say "편관" or
-"Seven Killings" — say "today brings a kind of pressure energy that pushes
-against your steady, grounded nature".}
+{**Opening paragraph (2–3 sentences):** set the day's mood vividly with
+a concrete image or metaphor. "Today feels like X — Y." Mention how the
+day's energy specifically touches THIS user (their core nature). Use sensory
+or physical language where you can — light, weather, motion, weight.}
 
-**⭐ Overall** {stars}        {1 line, today only, plain language}
-**💕 Love** {stars}            {1 line}
-**💰 Money** {stars}           {1 line}
-**💼 Career** {stars}          {1 line}
-**🌿 Health** {stars}          {1 line}
+{**Body paragraph (4–6 sentences, flowing prose):** weave through what
+the day means for relationships, work, money, body — but as connected
+thoughts, NOT a bulleted list. Land 1–2 specific concrete nudges where
+they fit naturally ("if a friend suggests dinner out, go", "stretch your
+shoulders during the 3pm slump"). Use time-of-day texture if it helps
+(morning vs afternoon vs evening). Avoid generic "watch out for X".}
+
+(Visual star summary on a single line — for quick reference, not the main reading:)
+⭐ {n}/5 · 💕 {n}/5 · 💰 {n}/5 · 💼 {n}/5 · 🌿 {n}/5
 
 **☯ A reading from the I-Ching for this moment**
-{Hexagram name in plain English}, with a small change in the {moving_line}rd line.
-"{judgment translated into accessible English, not Legge's archaic phrasing}"
-{1–2 sentences applying the hexagram's lesson to TODAY only.}
+{**Narrative form, 3–4 sentences.** Don't just dump the judgment line. Set
+the scene: "The hexagram that comes up for you right now is **{name}**.
+Imagine **{vivid image of the trigrams — e.g. "still water sitting over
+a steady fire — heat rising into a calm reservoir"}**." Then translate
+the judgment into modern, accessible language with concrete meaning.
+Connect the lesson back to today's mood.}
 
-🍀 Lucky number: {n}    🎨 {color, plainly named}    🧭 {direction in everyday words: "facing east" not just "East"}
-✨ "{≤8 words takeaway}"
-
----
-
-🌌 **Your Life Reading**
-
-**Your core nature**
-{2–3 sentences describing the user as a person, derived from their day master
-+ chart structure. Plain English. NO "Yang Earth balanced 정인격 살인상생". 
-INSTEAD: "You're an Earth-type person — steady, deliberate, the kind of
-friend people lean on when things get heavy. The way your chart is built,
-outside pressure tends to make you stronger rather than break you."}
-
-**How your life moves**
-{2–3 sentences walking through the broad rhythms of life. NO "대운 신해운
-상관정재". INSTEAD: "Your twenties were about finding your voice and
-building a body of work. Right now (mid-30s through early 40s) is when
-that quiet building starts paying off visibly. Your forties and fifties
-are when wealth crystallizes."}
-
-**Where you are now**
-{2 sentences on the current 10-year period. Name the years (e.g. "2025–2035,
-ages 34 to 43"). Describe what this period feels like in plain terms.}
-
-**What helps you most**
-{1–2 sentences on the user's "favorable element" but described as a kind of
-energy or environment, not as 용신/오행 jargon. e.g. "Your chart benefits
-most from warm, nurturing influences — mentors, structured learning, and
-people who steady you. Avoid letting things get too dry or driven."}
-
-(Birth chart shown for reference, but explained, not just listed:)
-- Year of birth: {year_pillar} — {one short plain-language descriptor}
-- Month of birth: {month_pillar} — {descriptor}
-- Day of birth: {day_pillar} ← **this is your "core self"** ({plain element})
-- Hour of birth: {hour_pillar} — {descriptor}
-
+🍀 {number} · 🎨 {color} · 🧭 {direction} · ✨ *"{≤10 words}"*
 ```
 
-Star notation: `★★★★★` / `★★★★☆` / `★★★☆☆` / `★★☆☆☆` (5/4/3/2). No 1-star.
-Vary star distribution across categories. Average around 3.5.
+**Star scale:** 2/5 worst possible (no 1/5). Vary distribution — never identical across categories. Average ~3.5.
+
+### Your Life Reading
+
+```
+🌌 **Your Life Reading**
+
+{**Character sketch (3–4 sentences as flowing prose):** describe the user
+as a person, the way a friend might write about them. Start with a core
+image of who they are. Mention how the chart is built — what makes them
+resilient, what they're drawn to, what subtle tension lives inside their
+nature. NO "Yang Earth balanced". INSTEAD: "You're built like a quiet
+mountain — solid, deliberate, the kind of person people steady themselves
+against." Then add nuance: their inner contradictions, their strengths
+under pressure, what energy lives in their chart that others sense.}
+
+{**Life arc as a story (one connected paragraph, 4–6 sentences):**
+narrate the user's life as chapters of a book. "Your twenties were the
+years of... The decade you've just stepped into is when... After 45, the
+weight of the chart shifts toward..." Make transitions feel earned, not
+listed. Name the years and ages. Land it on where they are right now.}
+
+{**Where you are now (2–3 sentences):** zoom into the current 10-year
+period with specific texture. What does this decade feel like to live
+through? What's its central theme? What's quietly easier or harder
+than before?}
+
+{**What helps you most (2–3 sentences):** describe favorable energy
+through specific, concrete examples — not as abstract elements. "You
+do best with warm, nurturing presences in your life — mentors, structured
+learning, a hot meal at the end of the day. Dry, driven, all-edge
+environments wear you down faster than you notice."}
+
+**Your birth chart at a glance** *(the actual data, but with each pillar
+explained in a single warm phrase — not a debug list):*
+- 1992 (year): **{pillar}** — {one phrase like "deep waters reflecting hard metal"}
+- 7th lunar month (month): **{pillar}** — {phrase}
+- Day of birth: **{pillar}** ← *your core self*, {phrase like "the patient mountain"}
+- 4:30 AM (hour): **{pillar}** — {phrase}
+```
+
+**Length target:** Today section 18–22 lines. Life section 22–28 lines. Total reading ≤ 50 lines including spacing. Better to be richly written than to fill a quota — but don't be skimpy either.
+
+**Sentence rhythm:**
+- Vary sentence length deliberately. Mix short punches with longer flowing ones.
+- Avoid the choppy cadence of "X. Y. Z. W." in a row.
+- Use commas, em dashes, colons to create breathing room.
+- One vivid image per paragraph beats five abstract claims.
+
+**Forbidden writing patterns:**
+- Five bullet points each starting with "★★★☆☆ — ..." — feels like a database
+- "Today brings X energy. Be careful with Y. Watch your Z." — flat, generic
+- Listing the chart pillars without descriptors
+- Repeating the same sentence structure in consecutive lines
+- Starting every line with the same word
+- Generic platitudes ("balance is important", "trust yourself")
 
 ## Readability — both Korean AND English output
 
@@ -200,8 +229,9 @@ Skip Life Reading. Today's Fortune uses generic interpretation.
 - **Balanced.** Average ~3.5 stars; vary distribution. Never all 5.
 - **No doom.** No direct accident/illness/death/breakup predictions. "A day to take it easy on X" is the limit.
 - **No disclaimers.** No "just for fun".
-- **Total length** ≤ 35 lines. Today section ≤ 15, Life section ≤ 18.
-- **Warm tone.** This is fortune-telling, not a database printout.
+- **Length: rich prose, not data printout.** Today section 18–22 lines. Life section 22–28 lines. Trade quantity of bullets for quality of sentences.
+- **Warm, embodied tone.** This is a fortune-teller speaking — sensory, image-driven, alive. Not a database printout. Not corporate copy.
+- **Concrete over abstract.** "Stretch during the 3pm slump" beats "watch your health". A vivid image of still water over fire beats "Hexagram 49: Revolution".
 - **English default.** Switch on signal.
 
 ## Common mistakes
