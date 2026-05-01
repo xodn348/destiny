@@ -13,13 +13,37 @@
 
 ## Quick start
 
+### Prerequisites
+
+- [Claude Code](https://claude.com/claude-code) **v2.0 or newer**
+  - Check with `claude --version`
+  - Update with `npm i -g @anthropic-ai/claude-code`
+- The `/plugin` command must be available. On modern Claude Code it's on by default. If `/plugin` isn't recognized inside Claude Code, run `/config` and enable Plugins, then restart Claude Code.
+
+### Install (inside Claude Code)
+
 ```
 /plugin marketplace add xodn348/destiny
 /plugin install destiny@destiny-marketplace
 /destiny
 ```
 
-That's it. The first call asks for your birth date, time, city, and gender — once. Every call after is just `/destiny`.
+### Install from terminal (fallback if `/plugin` isn't available)
+
+```bash
+claude plugin marketplace add xodn348/destiny
+claude plugin install destiny@destiny-marketplace
+```
+
+Then launch Claude Code and run `/destiny`.
+
+### Verify
+
+```bash
+claude plugin list   # should show: destiny@destiny-marketplace
+```
+
+That's it. The first `/destiny` call asks for your birth date, time, city, and gender — once. Every call after is just `/destiny`.
 
 ## How it flows
 
