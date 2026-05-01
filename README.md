@@ -1,109 +1,93 @@
-# destiny
+<p align="center">
+  <img src="assets/hero.png" alt="destiny — a real fortune skill for Claude Code" width="700">
+</p>
 
-A real fortune-telling skill for [Claude Code](https://claude.com/claude-code). Type `/destiny` and you get today's fortune instantly — no questions asked, no LLM hallucination. The numbers are computed; only the interpretation is generative.
+<h1 align="center">destiny</h1>
 
-```
-🔮 Today's Fortune — 2026-04-30 (Thursday)
-
-The day's energy is Wood (甲戌). A pushing-outward kind of day —
-ideas want to leave the desk and meet someone.
-
-⭐ Overall ★★★★☆
-The path is open. Don't overthink the next small step.
-
-💕 Love ★★★☆☆
-A short message lands more than a long one today.
-
-💰 Money ★★★★☆
-A small gain through someone close — accept it gracefully.
-
-💼 Career & Studies ★★★★★
-The thing you've been stuck on starts to move. Around 3 PM, watch.
-
-🌿 Health ★★★☆☆
-Eyes and shoulders carry today's weight. Step away from the screen.
-
-☯ Hexagram for this moment
-19. Approach (지택림 · 臨)
-☷ Earth over ☱ Lake, moving line 4
-"The great approaches; in eighth month, decline."
-
-A door opens. Walk through it now — the favorable window is real
-but won't last forever.
+<p align="center">
+  A real fortune-telling skill for <a href="https://claude.com/claude-code">Claude Code</a>.<br>
+  Not a horoscope generator. The numbers are computed; only the interpretation is generative.
+</p>
 
 ---
-🍀 Lucky number: 46
-🎨 Lucky color: Forest green
-🧭 Lucky direction: East
-✨ Words for today: "Move while the door is open."
-```
 
-## Install
-
-This repo is both a Claude Code **plugin** and a single-plugin **marketplace**:
+## Quick start
 
 ```
 /plugin marketplace add xodn348/destiny
 /plugin install destiny@destiny-marketplace
-```
-
-Or locally:
-
-```
-/plugin marketplace add ~/code/destiny
-```
-
-The skill auto-installs `lunar-python` on first run.
-
-## Usage
-
-```
 /destiny
 ```
 
-That's it. You get today's fortune.
+That's it. The first call asks for your birth date, time, city, and gender — once. Every call after is one word: `/destiny`.
 
-Optional — if you want a **personal birth-chart reading** (Four Pillars / BaZi):
+## How it flows
 
 ```
-/destiny born 1992-08-15 14:30 Seoul male
+Claude Code
+   │
+   ▼
+destiny plugin            ← installed once via /plugin install
+   │
+   ▼
+/destiny skill            ← invoked any time
+   │
+   ▼
+your birth info           ← asked once, saved to ~/.destiny/profile.json
+   │
+   ▼
+destiny of the day        ← personalized reading: today's fortune + life reading
 ```
 
-Other variants:
-- `/destiny iching` — just the hexagram + lucky items
-- `/destiny in korean` (or japanese / chinese / spanish) — switch language
+## What you get
 
-## What's actually computed
+Each `/destiny` produces a two-section reading:
 
-A Python script computes the deterministic parts. Claude only writes the prose.
+**🔮 Today's Fortune** — a short prose reading of today against your chart, with five-category stars (overall, love, money, career, health), a hexagram drawn for this moment, and lucky number / color / direction.
 
-| What | How |
+**🌌 Life Reading** — your character, the broad arc of your life, and where you are in the current 10-year period. Plain language, no untranslated jargon.
+
+## What's actually computed (vs. invented)
+
+| Layer | Source |
 |---|---|
-| Today's date / day pillar | [`lunar-python`](https://github.com/6tail/lunar-python) — real 만세력 |
-| One I-Ching hexagram for now | 매화역수 시점법 (plum-blossom time divination) from lunar 연/월/일/시 |
-| Lucky number | Hexagram number × matter-of-time sum, mod 100 |
-| Lucky color & direction | Day pillar's element (Wood/Fire/Earth/Metal/Water) |
-| Hexagram corpus | King Wen ordering, Legge (1899) judgments — public domain |
+| 사주 8 characters from your birth | `lunar-python` (real 만세력, equivalent to KASI national calendar) |
+| True solar time correction | longitude offset from KST (1° = 4 min) |
+| Korean DST handling (1987–88) | auto |
+| Today's day pillar (일진) | `lunar-python` |
+| Five Elements + Ten Gods (십신) | classical 60-cycle lookup tables |
+| Branch interactions (합·충·형) | classical lookup tables |
+| I-Ching hexagram for the moment | 매화역수 시점법 (plum-blossom time divination) |
+| Hexagram corpus | King Wen ordering, Legge (1899) public-domain translation |
+| Lucky number / color / direction | derived from your day master + hexagram |
+| **Star ratings + character + life arc + advice** | **Claude, applying classical 명리 knowledge to the data above** |
 
-Personal mode adds the Four Pillars chart with all classical corrections:
+Same person + same day = identical script output, every time. Only the prose phrasing changes.
 
-| Correction | Applied |
-|---|---|
-| Solar→lunar conversion | ✅ |
-| 24 solar terms for month pillar | ✅ |
-| True solar time by birthplace longitude | ✅ (1° = 4 min) |
-| Korean DST 1987-05-10 ~ 1988-10-09 | ✅ auto |
-| 야자시(default) vs 조자시 | ✅ selectable |
-| Ten Gods (십신) relationships | ✅ |
-| 10-year luck cycles (대운) | ✅ |
+No external APIs, no scraped sites. Everything runs locally.
 
-No external API calls. Everything runs locally.
+## Variants
+
+- `/destiny` — full reading (auto-loaded profile)
+- `/destiny today` — only today's fortune
+- `/destiny life` — only life reading
+- `/destiny reset` — delete saved profile and start over
+- `/destiny in english|korean|japanese|chinese|spanish` — switch language
+- `/destiny born YYYY-MM-DD HH:MM <city> <m|f>` — one-off without saving
+- `/destiny quick` — generic daily, no personal data
+
+## Why this exists
+
+Most fortune apps either (a) use real 만세력 calculation but hide proprietary interpretation rules behind a paywall, or (b) generate everything with an LLM and call it astrology. This skill keeps the deterministic part deterministic (you can verify your 사주 against any Korean 만세력 site) and lets Claude do what it's actually good at — applying classical 명리 reading conventions to that fixed data.
+
+Default output is English with all 한자 / 명리 terms unpacked into plain language. A foreigner with zero exposure to 사주 should follow it. Korean output keeps the terse traditional terms.
 
 ## Stack
 
 - Python 3.10+
 - [`lunar-python`](https://github.com/6tail/lunar-python) (MIT) — pure-Python lunar calendar engine
-- I-Ching data: King Wen ordering + Legge (1899) public-domain judgments
+- I-Ching: King Wen ordering + Legge (1899) public-domain judgments
+- Claude Code plugin format
 
 ## License
 
